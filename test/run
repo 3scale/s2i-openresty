@@ -135,7 +135,21 @@ test_connection() {
 test_config() {
   echo "Testing nginx config ..."
 
-  test=$(docker exec $(cat $cid_file) container-entrypoint openresty -p . -c nginx.conf -t)
+  test=$(docker exec $(cat $cid_file) container-entrypoint openresty -p . -t)
+
+  return $?
+}
+
+test_top() {
+  echo "Testing number of nginx processes ..."
+
+  ps=$(docker top $(cat $cid_file) | tail -n +2)
+  docker top $(cat $cid_file)
+
+  openresty=$(echo ${ps} | grep -c '{openresty}')
+  total=$(echo ${ps} | wc -l)
+
+  [ $openresty -eq $total ]
 
   return $?
 }
@@ -160,6 +174,9 @@ test_connection
 check_result $?
 
 test_config
+check_result $?
+
+test_top
 check_result $?
 
 cleanup
