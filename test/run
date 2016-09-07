@@ -146,7 +146,7 @@ test_top() {
   ps=$(docker top $(cat $cid_file) | tail -n +2)
   docker top $(cat $cid_file)
 
-  openresty=$(echo ${ps} | grep -c '{openresty}')
+  openresty=$(echo ${ps} | grep -c 'nginx:')
   total=$(echo ${ps} | wc -l)
 
   [ $openresty -eq $total ]
