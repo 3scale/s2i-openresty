@@ -25,8 +25,6 @@ RUN yum install -y \
         bind-utils \ 
         openresty-${OPENRESTY_RPM_VERSION} \
         openresty-resty-${OPENRESTY_RPM_VERSION} \
-    && wget https://github.com/Yelp/dumb-init/releases/download/v1.0.1/dumb-init_1.0.1_amd64 -O /usr/local/bin/dumb-init \
-    && chmod a+x /usr/local/bin/dumb-init \
     && wget http://luarocks.org/releases/luarocks-${LUAROCKS_VERSION}.tar.gz \
     && tar -xzvf luarocks-${LUAROCKS_VERSION}.tar.gz \
     && cd luarocks-${LUAROCKS_VERSION}/ \
