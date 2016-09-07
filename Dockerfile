@@ -5,13 +5,12 @@ MAINTAINER 3scale <operations@3scale.net>
 
 ARG OPENRESTY_RPM_VERSION="1.11.2.1-3.el7.centos"
 ARG LUAROCKS_VERSION="2.3.0"
-ENV AUTO_UPDATE_INTERVAL=0 NGINX_PREFIX=/usr/local/openresty/nginx LUALIB_PREFIX=/usr/local/openresty/lualib
-ENV BUILDER_VERSION 0.1
+ENV AUTO_UPDATE_INTERVAL=0 BUILDER_VERSION=0.1
+
 LABEL io.k8s.description="Platform for building openresty" \
       io.k8s.display-name="s2i Openresty centos 7 - 1.11.2.1" \
       io.openshift.expose-services="8080:http" \
       io.openshift.tags="builder,s2i,openresty,luarocks,gateway"
-
 
 ADD openresty.repo /etc/yum.repos.d/openresty.repo
 
@@ -25,8 +24,6 @@ RUN yum install -y \
         bind-utils \ 
         openresty-${OPENRESTY_RPM_VERSION} \
         openresty-resty-${OPENRESTY_RPM_VERSION} \
-    && wget https://github.com/Yelp/dumb-init/releases/download/v1.0.1/dumb-init_1.0.1_amd64 -O /usr/local/bin/dumb-init \
-    && chmod a+x /usr/local/bin/dumb-init \
     && wget http://luarocks.org/releases/luarocks-${LUAROCKS_VERSION}.tar.gz \
     && tar -xzvf luarocks-${LUAROCKS_VERSION}.tar.gz \
     && cd luarocks-${LUAROCKS_VERSION}/ \
