@@ -1,6 +1,6 @@
 IMAGE_NAME ?= s2i-openresty-centos7
 build:
-	docker build -t $(IMAGE_NAME) .
+	docker build --pull --tag $(IMAGE_NAME) .
 
 .PHONY: test test/test-app
 
