@@ -36,7 +36,7 @@ RUN yum install -y \
     && make build \
     && make install \
     && rm -rf /tmp/* \
-    && yum remove -y make \
+    && echo "Cleaning all dependencies" \
     && yum clean all -y \
     && mkdir -p /opt/app/logs \
     && rmdir /usr/local/openresty/nginx/logs \
