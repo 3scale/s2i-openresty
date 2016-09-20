@@ -16,7 +16,8 @@ ADD openresty.repo /etc/yum.repos.d/openresty.repo
 
 WORKDIR /tmp
 
-RUN yum install -y \
+RUN yum upgrade -y \
+ && yum install -y \
         make \
         unzip \
         git \
