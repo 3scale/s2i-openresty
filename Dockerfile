@@ -26,7 +26,7 @@ RUN yum upgrade -y \
         openresty-${OPENRESTY_RPM_VERSION} \
         openresty-resty-${OPENRESTY_RPM_VERSION} \
         perl-Test-Nginx \
-    && wget http://luarocks.org/releases/luarocks-${LUAROCKS_VERSION}.tar.gz \
+    && wget https://github.com/keplerproject/luarocks/archive/v${LUAROCKS_VERSION}.tar.gz -O luarocks-${LUAROCKS_VERSION}.tar.gz \
     && tar -xzvf luarocks-${LUAROCKS_VERSION}.tar.gz \
     && cd luarocks-${LUAROCKS_VERSION}/ \
     && ./configure --prefix=/opt/app --sysconfdir=/opt/app/luarocks --force-config \
