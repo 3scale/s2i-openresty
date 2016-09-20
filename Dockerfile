@@ -24,6 +24,7 @@ RUN yum install -y \
         bind-utils \ 
         openresty-${OPENRESTY_RPM_VERSION} \
         openresty-resty-${OPENRESTY_RPM_VERSION} \
+        perl-Test-Nginx \
     && wget http://luarocks.org/releases/luarocks-${LUAROCKS_VERSION}.tar.gz \
     && tar -xzvf luarocks-${LUAROCKS_VERSION}.tar.gz \
     && cd luarocks-${LUAROCKS_VERSION}/ \
