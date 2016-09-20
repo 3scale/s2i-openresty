@@ -10,6 +10,9 @@ build:
 test/test-app:
 	git submodule update --init --recursive $@
 
+bash:
+	docker run -it --user root $(IMAGE_NAME) bash
+
 push:
 	docker tag $(IMAGE_NAME) $(REGISTRY)/$(IMAGE_NAME)
 	docker push $(REGISTRY)/$(IMAGE_NAME)
