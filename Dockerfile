@@ -16,7 +16,8 @@ ADD openresty.repo /etc/yum.repos.d/openresty.repo
 
 WORKDIR /tmp
 
-RUN yum install -y \
+RUN yum upgrade -y \
+ && yum install -y \
         make \
         unzip \
         git \
@@ -36,7 +37,7 @@ RUN yum install -y \
     && make build \
     && make install \
     && rm -rf /tmp/* \
-    && yum remove -y make \
+    && echo "Cleaning all dependencies" \
     && yum clean all -y \
     && mkdir -p /opt/app/logs \
     && rmdir /usr/local/openresty/nginx/logs \

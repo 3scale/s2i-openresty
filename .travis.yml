@@ -26,6 +26,5 @@ script:
 after_success:
 - if [ "$TRAVIS_BRANCH" == "master" ]; then
   docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" quay.io;
-  docker tag ${IMAGE_NAME} quay.io/3scale/${IMAGE_NAME};
-  docker push quay.io/3scale/${IMAGE_NAME};
+  make push;
   fi
