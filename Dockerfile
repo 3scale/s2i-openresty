@@ -4,7 +4,7 @@ FROM openshift/base-centos7
 MAINTAINER 3scale <operations@3scale.net>
 
 ARG OPENRESTY_RPM_VERSION="1.11.2.1-3.el7.centos"
-ARG LUAROCKS_VERSION="2.3.0"
+ARG LUAROCKS_VERSION="2.4.0"
 ENV AUTO_UPDATE_INTERVAL=0 BUILDER_VERSION=0.1
 
 LABEL io.k8s.description="Platform for building openresty" \
