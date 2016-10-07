@@ -26,12 +26,13 @@ RUN yum install -y epel-release \
         bind-utils \ 
         openresty-${OPENRESTY_RPM_VERSION} \
         openresty-resty-${OPENRESTY_RPM_VERSION} \
-        perl-Test-Nginx \
+	perl-Test-Nginx \
     && wget https://github.com/keplerproject/luarocks/archive/v${LUAROCKS_VERSION}.tar.gz -O luarocks-${LUAROCKS_VERSION}.tar.gz \
     && tar -xzvf luarocks-${LUAROCKS_VERSION}.tar.gz \
     && cd luarocks-${LUAROCKS_VERSION}/ \
     && ./configure --prefix=/opt/app --sysconfdir=/opt/app/luarocks --force-config \
         --with-lua=/usr/local/openresty/luajit \
+        --rocks-tree=/usr/local/openresty/luajit \
         --lua-suffix=jit \
         --with-lua-include=/usr/local/openresty/luajit/include/luajit-2.1 \
         --with-lua-version=5.1 \
@@ -55,7 +56,12 @@ COPY ./.s2i/bin/ /usr/libexec/s2i
 RUN ln -sf /usr/libexec/s2i/entrypoint /usr/local/bin/container-entrypoint
 
 #TODO: Drop the root user and make the content of /opt/app owned by user 1001
-RUN mkdir -p /opt/app/logs /opt/app/http.d && chmod g+w /opt/app /opt/app/* /opt/app/share/lua/5.1 /opt/app/http.d
+RUN mkdir -p -v /opt/app/logs /opt/app/http.d /usr/local/openresty/luajit/lib/luarocks "${HOME}/.cache" \
+ && chmod -v g+w /opt/app /opt/app/* \
+                 /usr/local/openresty/luajit/share/lua/5.1 \
+		 /usr/local/openresty/luajit \
+                 /usr/local/openresty/luajit/lib/luarocks \
+		 "${HOME}/.cache"
 
 # This default user is created in the openshift/base-centos7 image
 USER 1001

@@ -22,9 +22,11 @@ if (echo "$OSTYPE" | egrep -qs 'darwin'); then
 fi
 
 test_dir="$($READLINK_EXEC -zf $(dirname "${BASH_SOURCE[0]}"))"
+test_app=file://${test_dir}/test-app
 image_dir=$($READLINK_EXEC -zf ${test_dir}/..)
 scripts_url="file://${image_dir}/.s2i/bin"
 cid_file=$($MKTEMP_EXEC -u --suffix=.cid)
+runtime_cid_file=$(${MKTEMP_EXEC} -u --suffix=.cid)
 
 # Since we built the candidate image locally, we don't want S2I to attempt to pull
 # it from Docker hub
@@ -41,12 +43,28 @@ container_exists() {
   image_exists $(cat $cid_file)
 }
 
+runtime_container_exists() {
+  image_exists $(cat ${runtime_cid_file})
+}
+
 container_ip() {
-  docker inspect --format="{{ .NetworkSettings.IPAddress }}" $(cat $cid_file)
+  local cid=$1
+  docker inspect --format="{{ .NetworkSettings.IPAddress }}" $(cat ${cid})
 }
 
 run_s2i_build() {
-  s2i build --incremental=true ${s2i_args} file://${test_dir}/test-app ${IMAGE_NAME} ${IMAGE_NAME}-testapp
+  s2i build --context-dir=apicast --incremental=true ${s2i_args} ${test_app} ${IMAGE_NAME} ${IMAGE_NAME}-testapp
+}
+
+run_s2i_runtime_build() {
+  s2i build --context-dir=apicast ${s2i_args} --runtime-image=${IMAGE_NAME}-runtime ${test_app} ${IMAGE_NAME} ${IMAGE_NAME}-runtime-testapp
+}
+
+prepare_runtime() {
+  if ! image_exists ${IMAGE_NAME}-runtime; then
+    echo "ERROR: The image ${IMAGE_NAME}-runtime must exist before this script is executed."
+    exit 1
+  fi
 }
 
 prepare() {
@@ -57,7 +75,8 @@ prepare() {
   # s2i build requires the application is a valid 'Git' repository
   pushd ${test_dir}/test-app >/dev/null
 
-  if [ -d .git ]; then
+  # made the .git a symlink, see https://github.com/openshift/source-to-image/issues/606
+  if ! [ -d .git/objects ]; then
     echo "ERROR: Expected ${test_dir}/test-app to be a git repository."
     exit 1
   fi
@@ -68,6 +87,10 @@ prepare() {
 
 run_test_application() {
   docker run --user 100001 --rm --cidfile=${cid_file} -p ${test_port} --env THREESCALE_PORTAL_ENDPOINT=http://127.0.0.1 ${IMAGE_NAME}-testapp "$@"
+}
+
+run_runtime_test_application() {
+  docker run --user 100002 --rm --cidfile=${runtime_cid_file} -p ${test_port} --env THREESCALE_PORTAL_ENDPOINT=http://127.0.0.1 ${IMAGE_NAME}-runtime-testapp "$@"
 }
 
 cleanup() {
@@ -81,6 +104,17 @@ cleanup() {
   fi
 }
 
+cleanup_runtime() {
+  if [ -f ${runtime_cid_file} ]; then
+    if runtime_container_exists; then
+      docker stop $(cat ${runtime_cid_file})
+    fi
+  fi
+  if image_exists ${IMAGE_NAME}-runtime-testapp; then
+    docker rmi ${IMAGE_NAME}-runtime-testapp
+  fi
+}
+
 check_result() {
   local result="$1"
   if [[ "$result" != "0" ]]; then
@@ -91,12 +125,13 @@ check_result() {
 }
 
 wait_for_cid() {
+  local cid=$1
   local max_attempts=10
   local sleep_time=1
   local attempt=1
   local result=1
   while [ $attempt -le $max_attempts ]; do
-    [ -f $cid_file ] && break
+    [ -f ${cid} ] && break
     echo "Waiting for container to start..."
     attempt=$(( $attempt + 1 ))
     sleep $sleep_time
@@ -110,15 +145,17 @@ test_usage() {
 
 test_connection() {
   echo "Testing HTTP connection..."
+  local cid=$1
   local max_attempts=10
   local sleep_time=1
   local attempt=1
   local result=1
   local timeout=5
   while [ $attempt -le $max_attempts ]; do
-    echo "Sending GET request to http://$(container_ip):${test_port}/"
+    local ip=$(container_ip ${cid})
+    echo "Sending GET request to http://${ip}:${test_port}/"
     # response_code=$(curl -s -w %{http_code} --max-time ${timeout} -o /dev/null http://$(container_ip):${test_port}/)
-    response_code=$(docker run --rm sequenceiq/alpine-curl curl -s -w %{http_code} --max-time ${timeout} -o /dev/null http://$(container_ip):${test_port}/status/live)
+    response_code=$(docker run --rm sequenceiq/alpine-curl curl -s -w %{http_code} --max-time ${timeout} -o /dev/null http://${ip}:${test_port}/status/live)
     status=$?
     if [ $status -eq 0 ]; then
       if [ $response_code -eq 200 ]; then
@@ -133,18 +170,21 @@ test_connection() {
 }
 
 test_config() {
+  local cid=$1
   echo "Testing nginx config ..."
 
-  test=$(docker exec $(cat $cid_file) container-entrypoint openresty -p . -t)
+  test=$(docker exec $(cat ${cid}) container-entrypoint openresty -p . -t)
 
   return $?
 }
 
 test_top() {
+  local cid=$1
+  local id=$(cat ${cid})
   echo "Testing number of nginx processes ..."
 
-  ps=$(docker top $(cat $cid_file) | tail -n +2)
-  docker top $(cat $cid_file)
+  ps=$(docker top ${id} | tail -n +2)
+  docker top ${id}
 
   openresty=$(echo ${ps} | grep -c 'nginx:')
   total=$(echo ${ps} | wc -l)
@@ -164,20 +204,35 @@ check_result $?
 test_usage
 check_result $?
 
+prepare_runtime
+run_s2i_runtime_build
+check_result $?
+
 # Verify that the HTTP connection can be established to test application container
 run_test_application &
 
 # Wait for the container to write its CID file
-wait_for_cid
+wait_for_cid ${cid_file}
 
-test_connection
+test_connection ${cid_file}
 check_result $?
 
-test_config
+test_config ${cid_file}
 check_result $?
 
-test_top
+test_top ${cid_file}
 check_result $?
 
 cleanup
 
+run_runtime_test_application &
+
+wait_for_cid ${runtime_cid_file}
+
+test_connection ${runtime_cid_file}
+check_result $?
+
+test_top ${runtime_cid_file}
+check_result $?
+
+cleanup_runtime
