@@ -16,7 +16,8 @@ ADD openresty.repo /etc/yum.repos.d/openresty.repo
 
 WORKDIR /tmp
 
-RUN yum upgrade -y \
+RUN yum install -y epel-release \
+ && yum upgrade -y \
  && yum install -y \
         make \
         unzip \
