@@ -21,6 +21,10 @@ push:
 	docker tag $(IMAGE_NAME) $(REGISTRY)/$(IMAGE_NAME)
 	docker push $(REGISTRY)/$(IMAGE_NAME)
 
+push-runtime:
+	docker tag $(IMAGE_NAME)-runtime $(REGISTRY)/$(IMAGE_NAME)-runtime
+	docker push $(REGISTRY)/$(IMAGE_NAME)-runtime
+
 test: test-build test/test-app
 	test/run
 
