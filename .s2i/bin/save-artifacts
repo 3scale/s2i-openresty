@@ -8,4 +8,4 @@
 #	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
 #
 
-tar -cf - --directory=/opt/app --exclude=share/lua/5.1/luarocks lib share/
+tar -cf - --directory=/usr/local/openresty/luajit lib/luarocks lib64/luarocks share/lua/5.1

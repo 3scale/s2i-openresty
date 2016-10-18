@@ -17,7 +17,7 @@ fi
 #
 if [ "$(ls /tmp/artifacts/ 2>/dev/null)" ]; then
   echo "---> Restoring build artifacts..."
-  cp -r /tmp/artifacts/. ./
+  cp -vr /tmp/artifacts/. /usr/local/openresty/luajit/
   rm -rf /tmp/artifacts/
 fi
 
@@ -28,6 +28,6 @@ echo "---> Building application from source..."
 
 cd /opt/app
 cp /tmp/src/*.rockspec /opt/app/
-/opt/app/bin/luarocks make *.rockspec
+luarocks make *.rockspec --tree=/usr/local/openresty/luajit
 
 ln -svf "$(pwd)/bin" "${HOME}"
