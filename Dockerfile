@@ -19,26 +19,11 @@ WORKDIR /tmp
 RUN yum install -y epel-release \
  && yum upgrade -y \
  && yum install -y \
-        make \
-        unzip \
-        git \
-        wget \
+        luarocks \
         bind-utils \ 
         openresty-${OPENRESTY_RPM_VERSION} \
         openresty-resty-${OPENRESTY_RPM_VERSION} \
-	perl-Test-Nginx \
-    && wget https://github.com/keplerproject/luarocks/archive/v${LUAROCKS_VERSION}.tar.gz -O luarocks-${LUAROCKS_VERSION}.tar.gz \
-    && tar -xzvf luarocks-${LUAROCKS_VERSION}.tar.gz \
-    && cd luarocks-${LUAROCKS_VERSION}/ \
-    && ./configure --prefix=/opt/app --sysconfdir=/opt/app/luarocks --force-config \
-        --with-lua=/usr/local/openresty/luajit \
-        --rocks-tree=/usr/local/openresty/luajit \
-        --lua-suffix=jit \
-        --with-lua-include=/usr/local/openresty/luajit/include/luajit-2.1 \
-        --with-lua-version=5.1 \
-    && make build \
-    && make install \
-    && rm -rf /tmp/* \
+        perl-Test-Nginx \
     && echo "Cleaning all dependencies" \
     && yum clean all -y \
     && mkdir -p /opt/app/logs \

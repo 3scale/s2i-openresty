@@ -1,5 +1,3 @@
 #!/bin/bash
 
-eval `/opt/app/bin/luarocks path`
-
 exec "$@"
