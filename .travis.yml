@@ -21,10 +21,11 @@ before_install:
 - export PATH="${PATH}:${HOME}/bin"
 install:
 - make build
+- make build-runtime
 script:
 - make test
 after_success:
-- if [ "$TRAVIS_BRANCH" == "master" ]; then
+- if [ "$TRAVIS_BRANCH" == "master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
   docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" quay.io;
-  make push;
+  make push push-runtime;
   fi

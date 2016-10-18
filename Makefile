@@ -5,11 +5,15 @@ REGISTRY ?= quay.io/3scale
 build:
 	docker build $(FORCE_PULL) --tag $(IMAGE_NAME) .
 
+build-runtime:
+	docker build $(FORCE_PULL) --tag $(IMAGE_NAME)-runtime -f Dockerfile.runtime .
+
 .PHONY: test test/test-app
 
 test/test-app:
 	git submodule update --init --recursive $@
-
+	rm "$@/.git"
+	ln -sfv ../../.git/modules/$@ "$@/.git"
 bash:
 	docker run -it --user root $(IMAGE_NAME) bash
 
@@ -17,6 +21,12 @@ push:
 	docker tag $(IMAGE_NAME) $(REGISTRY)/$(IMAGE_NAME)
 	docker push $(REGISTRY)/$(IMAGE_NAME)
 
-test: export IMAGE_NAME := $(IMAGE_NAME)-candidate
-test: build test/test-app
+push-runtime:
+	docker tag $(IMAGE_NAME)-runtime $(REGISTRY)/$(IMAGE_NAME)-runtime
+	docker push $(REGISTRY)/$(IMAGE_NAME)-runtime
+
+test: test-build test/test-app
 	test/run
+
+test-build: export IMAGE_NAME := $(IMAGE_NAME)-candidate
+test-build: build build-runtime

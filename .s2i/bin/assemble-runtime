@@ -13,21 +13,10 @@ if [[ "$1" == "-h" ]]; then
 	exec /usr/libexec/s2i/usage
 fi
 
-# Restore artifacts from the previous build (if they exist).
-#
-if [ "$(ls /tmp/artifacts/ 2>/dev/null)" ]; then
-  echo "---> Restoring build artifacts..."
-  cp -r /tmp/artifacts/. ./
-  rm -rf /tmp/artifacts/
-fi
+echo "---> Copying runtime artifacts"
 
-echo "---> Installing application source..."
-cp -Rf /tmp/src/. ./
-
-echo "---> Building application from source..."
-
-cd /opt/app
-cp /tmp/src/*.rockspec /opt/app/
-/opt/app/bin/luarocks make *.rockspec
-
-ln -svf "$(pwd)/bin" "${HOME}"
+ln --verbose --symbolic "$(pwd)/share/lua/"* /usr/local/share/lua/
+cp --verbose --recursive --no-target-directory --no-clobber "$(pwd)/app" "$(pwd)/src"
+ln --verbose --symbolic "$(pwd)/src/bin" "$(pwd)/bin"
+ln --verbose --symbolic "$(pwd)/src/http.d" "$(pwd)"
+chmod --verbose g+w "$(pwd)/http.d/resolver.conf"
