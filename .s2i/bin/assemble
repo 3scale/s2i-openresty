@@ -27,7 +27,14 @@ cp -Rf /tmp/src/. ./
 echo "---> Building application from source..."
 
 cd /opt/app
-cp /tmp/src/*.rockspec /opt/app/
-luarocks make *.rockspec --tree=/usr/local/openresty/luajit
 
-ln -svf "$(pwd)/bin" "${HOME}"
+if compgen -G "/tmp/src/*.rockspec" > /dev/null; then
+  cp /tmp/src/*.rockspec /opt/app/
+  luarocks make ./*.rockspec --tree=/usr/local/openresty/luajit
+
+fi
+
+if [ ! -e "$(pwd)/bin" ];
+then
+  ln -svf "$(pwd)/bin" "${HOME}"
+fi
