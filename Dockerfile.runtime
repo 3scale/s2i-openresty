@@ -26,7 +26,8 @@ RUN mkdir -p "${HOME}" && \
     ln -s /dev/stderr /opt/app-root/src/logs/error.log && \
     mkdir -p /usr/local/share/lua/ && \
     chmod g+w /usr/local/share/lua/ && \
-    chown -R 1001:0 /opt/app-root /usr/local/share/lua/
+    chown -R 1001:0 /opt/app-root /usr/local/share/lua/ && \
+    ln -s /opt/app-root/app /opt/app
 
 LABEL \
       # Location of the STI scripts inside the image.
@@ -38,11 +39,12 @@ LABEL \
       io.openshift.tags="builder,s2i,openresty"
 
 COPY bin/ /usr/bin/
-COPY ./.s2i/bin/assemble-runtime /usr/libexec/s2i/
+COPY ./.s2i/bin/assemble* /usr/libexec/s2i/
 
 #TODO: Drop the root user and make the content of /opt/app owned by user 1001
 RUN mkdir -p "${HOME}/logs" "${HOME}/http.d" && \
-    chmod g+w "${HOME}" "${HOME}"/* "${HOME}/http.d"
+    chmod g+w "${HOME}" "${HOME}"/* "${HOME}/http.d" && \
+    ln -s /opt/app-root/scripts/run /usr/libexec/s2i/
 
 # This default user is created in the openshift/base-centos7 image
 USER 1001
