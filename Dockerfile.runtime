@@ -43,7 +43,8 @@ COPY ./.s2i/bin/assemble* /usr/libexec/s2i/
 
 #TODO: Drop the root user and make the content of /opt/app owned by user 1001
 RUN mkdir -p "${HOME}/logs" "${HOME}/http.d" && \
-    chmod g+w "${HOME}" "${HOME}"/* "${HOME}/http.d"
+    chmod g+w "${HOME}" "${HOME}"/* "${HOME}/http.d" && \
+    ln -s /opt/app-root/scripts/run /usr/libexec/s2i/
 
 # This default user is created in the openshift/base-centos7 image
 USER 1001
