@@ -12,11 +12,11 @@ LABEL io.k8s.description="Platform for building openresty" \
       io.openshift.expose-services="8080:http" \
       io.openshift.tags="builder,s2i,openresty,luarocks,gateway"
 
-ADD openresty.repo /etc/yum.repos.d/openresty.repo
-
 WORKDIR /tmp
 
-RUN yum install -y epel-release \
+RUN yum clean all -y \
+ && yum-config-manager --add-repo https://openresty.org/yum/centos/OpenResty.repo \
+ && yum install -y epel-release \
  && yum upgrade -y \
  && yum install -y \
         luarocks \

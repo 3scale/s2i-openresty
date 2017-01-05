@@ -10,15 +10,15 @@ ENV \
     HOME=/opt/app-root/src \
     PATH=/opt/app-root/src/bin:/opt/app-root/bin:$PATH
 
-ADD openresty.repo /etc/yum.repos.d/openresty.repo
-
 RUN mkdir -p "${HOME}" && \
     useradd -u 1001 -r -g 0 -d ${HOME} -s /sbin/nologin \
           -c "Default Application User" default && \
+    yum-config-manager --add-repo https://openresty.org/yum/centos/OpenResty.repo && \
     rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
     yum install -y bind-utils tar && \
     yum install -y openresty-${OPENRESTY_RPM_VERSION} \
                    openresty-resty-${OPENRESTY_RPM_VERSION} && \
+    yum clean all -y && \
     mkdir /opt/app-root/src/logs && \
     rm -r /usr/local/openresty/nginx/logs && \
     ln -s /opt/app-root/src/logs /usr/local/openresty/nginx/logs && \
