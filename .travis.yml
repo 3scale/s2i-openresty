@@ -19,13 +19,14 @@ env:
 before_install:
 - travis/install-s2i.sh
 - export PATH="${PATH}:${HOME}/bin"
+- export IMAGE_NAME="${IMAGE_NAME}:${TRAVIS_TAG:-${TRAVIS_BRANCH:-${TRAVIS_PULL_REQUEST}}}"
 install:
 - make build
 - make build-runtime
 script:
 - make test
 after_success:
-- if [ "$TRAVIS_BRANCH" == "master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
+- if [ "$TRAVIS_BRANCH" = "master" -a "${TRAVIS_PULL_REQUEST}" = "false" ] || [ -n "${TRAVIS_TAG}" ]; then
   docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" quay.io;
   make push push-runtime;
   fi

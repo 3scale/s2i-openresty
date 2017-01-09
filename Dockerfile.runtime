@@ -2,7 +2,7 @@
 FROM centos:centos7
 MAINTAINER 3scale <operations@3scale.net>
 
-ARG OPENRESTY_RPM_VERSION="1.11.2.1-3.el7.centos"
+ARG OPENRESTY_RPM_VERSION="1.11.2.2-8.el7.centos"
 
 ENV \
     BUILDER_VERSION=0.1 \
@@ -10,15 +10,15 @@ ENV \
     HOME=/opt/app-root/src \
     PATH=/opt/app-root/src/bin:/opt/app-root/bin:$PATH
 
-ADD openresty.repo /etc/yum.repos.d/openresty.repo
-
 RUN mkdir -p "${HOME}" && \
     useradd -u 1001 -r -g 0 -d ${HOME} -s /sbin/nologin \
           -c "Default Application User" default && \
+    yum-config-manager --add-repo https://openresty.org/yum/centos/OpenResty.repo && \
     rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
+    yum install -y bind-utils tar && \
     yum install -y openresty-${OPENRESTY_RPM_VERSION} \
-                   openresty-resty-${OPENRESTY_RPM_VERSION} \
-                   bind-utils tar && \
+                   openresty-resty-${OPENRESTY_RPM_VERSION} && \
+    yum clean all -y && \
     mkdir /opt/app-root/src/logs && \
     rm -r /usr/local/openresty/nginx/logs && \
     ln -s /opt/app-root/src/logs /usr/local/openresty/nginx/logs && \
@@ -33,7 +33,7 @@ LABEL \
       # Location of the STI scripts inside the image.
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i \
       io.k8s.description="Platform for building openresty" \
-      io.k8s.display-name="s2i Openresty centos 7 - 1.11.2.1" \
+      io.k8s.display-name="s2i Openresty centos 7 - 1.11.2.2" \
       io.openshift.expose-services="8080:http" \
       io.openshift.s2i.assemble-input-files="/usr/local/openresty/luajit/share;/opt/app" \
       io.openshift.tags="builder,s2i,openresty"
