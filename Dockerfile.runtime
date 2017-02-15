@@ -15,7 +15,7 @@ RUN mkdir -p "${HOME}" && \
           -c "Default Application User" default && \
     yum-config-manager --add-repo https://openresty.org/yum/centos/OpenResty.repo && \
     rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
-    yum install -y bind-utils tar && \
+    yum install -y bind-utils tar dnsmasq && \
     yum install -y openresty-${OPENRESTY_RPM_VERSION} \
                    openresty-resty-${OPENRESTY_RPM_VERSION} && \
     yum clean all -y && \

@@ -22,6 +22,7 @@ RUN yum clean all -y \
         luarocks \
         bind-utils \ 
         perl-Test-Nginx \
+        dnsmasq \
  && yum install -y \
         openresty-${OPENRESTY_RPM_VERSION} \
         openresty-resty-${OPENRESTY_RPM_VERSION} \
