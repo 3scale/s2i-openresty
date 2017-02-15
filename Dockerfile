@@ -4,6 +4,7 @@ FROM openshift/base-centos7
 MAINTAINER 3scale <operations@3scale.net>
 
 ARG OPENRESTY_RPM_VERSION="1.11.2.2-8.el7.centos"
+ARG NEWRELIC_SDK_VERSION="nr_agent_sdk-v0.16.2.0-beta.x86_64"
 ARG LUAROCKS_VERSION="2.3.0"
 ENV AUTO_UPDATE_INTERVAL=0 BUILDER_VERSION=0.1
 
@@ -31,7 +32,10 @@ RUN yum clean all -y \
     && rmdir /usr/local/openresty/nginx/logs \
     && ln -s /opt/app/logs /usr/local/openresty/nginx/logs \
     && ln -sf /dev/stdout /opt/app/logs/access.log \
-    && ln -sf /dev/stderr /opt/app/logs/error.log
+    && ln -sf /dev/stderr /opt/app/logs/error.log \
+    && curl -L http://download.newrelic.com/agent_sdk/${NEWRELIC_SDK_VERSION}.tar.gz | tar -zx -C /usr/local/ -v --strip-components=1 ${NEWRELIC_SDK_VERSION}/lib \
+    && ln -s /usr/local/lib/libnewrelic-*.so /usr/lib64/
+
 
 # TODO (optional): Copy the builder files into /opt/app
 # COPY ./<builder_folder>/ /opt/app/
