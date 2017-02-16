@@ -1,4 +1,5 @@
-IMAGE_NAME ?= s2i-openresty-centos7
+TAG ?= latest
+IMAGE_NAME ?= s2i-openresty-centos7:$(TAG)
 FORCE_PULL ?= --pull
 REGISTRY ?= quay.io/3scale
 
