@@ -11,7 +11,7 @@ sha=$(echo "${S2I_VERSION}" | cut -f2 -d-)
 if [ ! -f "${PREFIX}/s2i" ]; then
   cd /tmp/
   mkdir -p "${PREFIX}"
-  wget -T 60 -c "https://github.com/openshift/source-to-image/releases/download/v${version}/source-to-image-${version}-${sha}-${os}-${arch}.tar.gz -O source-to-image.tar.gz"
+  wget -T 60 -c "https://github.com/openshift/source-to-image/releases/download/v${version}/source-to-image-v${version}-${sha}-${os}-${arch}.tar.gz" -O source-to-image.tar.gz
   tar -xzf source-to-image.tar.gz -C "${PREFIX}/"
   rm -rf source-to-image.tar.gz
 else
