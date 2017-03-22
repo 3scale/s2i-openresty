@@ -38,6 +38,7 @@ RUN yum clean all -y \
 # COPY ./<builder_folder>/ /opt/app/
 
 COPY ./.s2i/bin/ /usr/libexec/s2i
+COPY config-*.lua /etc/luarocks/
 
 # override entrypoint to always setup luarocks paths
 RUN ln -sf /usr/libexec/s2i/entrypoint /usr/local/bin/container-entrypoint
