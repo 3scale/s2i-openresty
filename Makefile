@@ -3,6 +3,8 @@ IMAGE_NAME ?= s2i-openresty-centos7:$(TAG)
 FORCE_PULL ?= --pull
 REGISTRY ?= quay.io/3scale
 
+CANDIDATE_IMAGE_NAME ?= $(IMAGE_NAME)-candidate
+
 build: ## Build builder image
 	docker build $(FORCE_PULL) --tag $(IMAGE_NAME) .
 
@@ -27,11 +29,11 @@ push-runtime: ## Tag and push the runtime iamge to the docker registry
 	docker push $(REGISTRY)/$(IMAGE_NAME)-runtime
 
 test: ## Run tests
+test: export IMAGE_NAME := $(CANDIDATE_IMAGE_NAME)
 test: test-build test/test-app
 	test/run
 
 test-build: ## Test just building the images
-test-build: export IMAGE_NAME := $(IMAGE_NAME)-candidate
 test-build: build build-runtime
 
 # Check http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
