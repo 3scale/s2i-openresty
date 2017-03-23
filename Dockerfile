@@ -29,11 +29,12 @@ RUN yum clean all -y \
         openresty-openssl \
     && echo "Cleaning all dependencies" \
     && yum clean all -y \
-    && mkdir -p /opt/app/logs \
+    && mkdir -p /opt/app/logs /opt/app/conf \
     && rmdir /usr/local/openresty/nginx/logs \
     && ln -s /opt/app/logs /usr/local/openresty/nginx/logs \
     && ln -sf /dev/stdout /opt/app/logs/access.log \
-    && ln -sf /dev/stderr /opt/app/logs/error.log
+    && ln -sf /dev/stderr /opt/app/logs/error.log \
+    && ln -s /etc/ssl/certs/ca-bundle.crt /opt/app/conf
 
 # TODO (optional): Copy the builder files into /opt/app
 # COPY ./<builder_folder>/ /opt/app/
