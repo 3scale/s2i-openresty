@@ -17,7 +17,8 @@ RUN mkdir -p "${HOME}" && \
     rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
     yum install -y bind-utils tar dnsmasq && \
     yum install -y openresty-${OPENRESTY_RPM_VERSION} \
-                   openresty-resty-${OPENRESTY_RPM_VERSION} && \
+                   openresty-resty-${OPENRESTY_RPM_VERSION} \
+                   openresty-openssl && \
     yum clean all -y && \
     mkdir /opt/app-root/src/logs && \
     rm -r /usr/local/openresty/nginx/logs && \
