@@ -1,5 +1,9 @@
 rocks_trees = {
-   { name = [[openresty]], root = [[/usr/local/openresty/luajit]] }
+   {
+      name = [[openresty]],
+      root = [[/usr/local/openresty/luajit]],
+      bin_dir = [[/opt/app-root/bin]]
+   }
 }
 
 variables = {
