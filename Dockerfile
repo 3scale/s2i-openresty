@@ -41,6 +41,7 @@ RUN yum clean all -y \
 
 COPY ./.s2i/bin/ /usr/libexec/s2i
 COPY config-*.lua /etc/luarocks/
+ENV LUA_PATH=";;/usr/lib64/lua/5.1/?.lua"
 
 # override entrypoint to always setup luarocks paths
 RUN ln -sf /usr/libexec/s2i/entrypoint /usr/local/bin/container-entrypoint
