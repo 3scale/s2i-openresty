@@ -50,6 +50,7 @@ RUN ln -sf /usr/libexec/s2i/entrypoint /usr/local/bin/container-entrypoint
 RUN mkdir -p -v /opt/app/logs /opt/app/http.d /usr/local/openresty/luajit/lib/luarocks "${HOME}/.cache" \
  && chmod -v g+w /opt/app /opt/app/* \
                  /usr/local/openresty/luajit/share/lua/5.1 \
+		 /usr/local/openresty/luajit/lib/lua/5.1 \
 		 /usr/local/openresty/luajit \
                  /usr/local/openresty/luajit/lib/luarocks \
 		 /usr/local/openresty/luajit/bin/ \
