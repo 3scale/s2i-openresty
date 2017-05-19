@@ -27,7 +27,9 @@ RUN mkdir -p "${HOME}" && \
     ln -s /dev/stderr /opt/app-root/src/logs/error.log && \
     mkdir -p /usr/local/share/lua/ && \
     chmod g+w /usr/local/share/lua/ && \
-    chown -R 1001:0 /opt/app-root /usr/local/share/lua/ && \
+    chown -R 1001:0 /opt/app-root /usr/local/share/lua/ \
+		 /usr/local/openresty/nginx/ \
+		 /usr/local/openresty/nginx/logs/ && \
     ln -s /opt/app-root/app /opt/app
 
 LABEL \
