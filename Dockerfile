@@ -53,6 +53,8 @@ RUN mkdir -p -v /opt/app/logs /opt/app/http.d /usr/local/openresty/luajit/lib/lu
 		 /usr/local/openresty/luajit \
                  /usr/local/openresty/luajit/lib/luarocks \
 		 /usr/local/openresty/luajit/bin/ \
+		 /usr/local/openresty/nginx/ \
+		 /usr/local/openresty/nginx/logs/ \
 		 "${HOME}/.cache"
 
 # This default user is created in the openshift/base-centos7 image
