@@ -26,6 +26,7 @@ RUN yum clean all -y \
  && yum install -y \
         openresty-${OPENRESTY_RPM_VERSION} \
         openresty-resty-${OPENRESTY_RPM_VERSION} \
+        openresty-debug-${OPENRESTY_RPM_VERSION} \
         openresty-openssl \
     && echo "Cleaning all dependencies" \
     && yum clean all -y \
