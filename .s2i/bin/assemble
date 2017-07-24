@@ -13,6 +13,10 @@ if [[ "$1" == "-h" ]]; then
 	exec /usr/libexec/s2i/usage
 fi
 
+# Fixing permissions
+mkdir -p /usr/local/openresty/nginx/{client_body_temp,proxy_temp,fastcgi_temp,uwsgi_temp,logs}
+chmod g+w /usr/local/openresty/nginx/{client_body_temp,proxy_temp,fastcgi_temp,uwsgi_temp,logs}
+
 # Restore artifacts from the previous build (if they exist).
 #
 if [ "$(ls /tmp/artifacts/ 2>/dev/null)" ]; then
