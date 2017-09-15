@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ -f /tmp/scripts/run ]; then 
-	exec /tmp/scripts/run
+	exec /tmp/scripts/run "$@"
 else
 	exec openresty -p /opt/app
 fi
