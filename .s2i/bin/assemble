@@ -30,7 +30,7 @@ cd /opt/app
 
 if compgen -G "/tmp/src/*.rockspec" > /dev/null; then
   cp /tmp/src/*.rockspec /opt/app/
-  find . -name "*.rockspec" -exec luarocks make {} \;
+  find . -name "*.rockspec" -exec luarocks ${LUAROCKS_INSTALL:-make} {} \;
 fi
 
 if [ ! -e "$(pwd)/bin" ];

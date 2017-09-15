@@ -1,7 +1,11 @@
 lua_interpreter = [[resty]]
 
 rocks_trees = {
-   { name = [[openresty]], root = [[/usr/local/openresty/luajit]] }
+   {
+      name = [[openresty]],
+      root = [[/usr/local/openresty/luajit]],
+      bin_dir = os_getenv('LUA_BIN_PATH'),
+   }
 }
 
 lib_modules_path = [[/lib/lua/]]..lua_version

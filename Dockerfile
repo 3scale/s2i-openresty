@@ -25,6 +25,7 @@ RUN yum clean all -y \
  && yum install -y \
         openresty-${OPENRESTY_RPM_VERSION} \
         openresty-resty-${OPENRESTY_RPM_VERSION} \
+        openresty-debug-${OPENRESTY_RPM_VERSION} \
         openresty-openssl \
     && echo "Cleaning all dependencies" \
     && yum clean all -y \
@@ -40,7 +41,7 @@ RUN yum clean all -y \
 
 COPY ./.s2i/bin/ /usr/libexec/s2i
 COPY config-*.lua /etc/luarocks/
-ENV LUA_PATH=";;/usr/lib64/lua/5.1/?.lua"
+ENV LUA_PATH=";;/usr/lib64/lua/5.1/?.lua" LUAROCKS_INSTALL=make
 
 # override entrypoint to always setup luarocks paths
 RUN ln -sf /usr/libexec/s2i/entrypoint /usr/local/bin/container-entrypoint
