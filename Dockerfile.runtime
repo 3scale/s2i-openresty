@@ -1,6 +1,5 @@
 # s2i-openresty-centos7-runtime
 FROM centos:centos7
-MAINTAINER 3scale <operations@3scale.net>
 
 ARG OPENRESTY_RPM_VERSION="1.11.2.5"
 

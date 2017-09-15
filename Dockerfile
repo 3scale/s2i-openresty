@@ -1,7 +1,6 @@
 
 # s2i-openresty-centos7
 FROM openshift/base-centos7
-MAINTAINER 3scale <operations@3scale.net>
 
 ARG OPENRESTY_RPM_VERSION="1.11.2.5"
 ARG LUAROCKS_VERSION="2.3.0"
