@@ -3,12 +3,12 @@
 FROM openshift/base-centos7
 MAINTAINER 3scale <operations@3scale.net>
 
-ARG OPENRESTY_RPM_VERSION="1.11.2.3"
+ARG OPENRESTY_RPM_VERSION="1.11.2.5"
 ARG LUAROCKS_VERSION="2.3.0"
 ENV AUTO_UPDATE_INTERVAL=0 BUILDER_VERSION=0.1
 
 LABEL io.k8s.description="Platform for building openresty" \
-      io.k8s.display-name="s2i Openresty centos 7 - 1.11.2.2" \
+      io.k8s.display-name="s2i Openresty centos 7 - ${OPENRESTY_RPM_VERSION}" \
       io.openshift.expose-services="8080:http" \
       io.openshift.tags="builder,s2i,openresty,luarocks,gateway"
 
