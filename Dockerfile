@@ -45,7 +45,8 @@ COPY config-*.lua /etc/luarocks/
 ENV LUA_PATH=";;/usr/lib64/lua/5.1/?.lua" LUAROCKS_INSTALL=make
 
 # override entrypoint to always setup luarocks paths
-RUN ln -sf /usr/libexec/s2i/entrypoint /usr/local/bin/container-entrypoint
+RUN ln -sf /usr/libexec/s2i/entrypoint /usr/local/bin/container-entrypoint \
+    && ln -s /usr/lib64/lua/5.1/luarocks /usr/share/lua/5.1/luarocks
 
 #TODO: Drop the root user and make the content of /opt/app owned by user 1001
 RUN mkdir -p -v /opt/app/logs /opt/app/http.d /usr/local/openresty/luajit/lib/luarocks "${HOME}/.cache" \
@@ -61,6 +62,8 @@ RUN mkdir -p -v /opt/app/logs /opt/app/http.d /usr/local/openresty/luajit/lib/lu
 
 # This default user is created in the openshift/base-centos7 image
 USER 1001
+
+RUN luarocks install --server=http://luarocks.org/dev lua-rover # 1
 
 WORKDIR /opt/app/
 EXPOSE 8080
