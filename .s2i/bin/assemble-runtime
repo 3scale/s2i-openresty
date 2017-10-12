@@ -14,9 +14,3 @@ if [[ "$1" == "-h" ]]; then
 fi
 
 echo "---> Copying runtime artifacts"
-
-ln --verbose --symbolic "$(pwd)/share/lua/"* /usr/local/share/lua/
-cp --verbose --recursive --no-target-directory --no-clobber "$(pwd)/app" "$(pwd)/src"
-ln --verbose --symbolic "$(pwd)/src/bin" "$(pwd)/bin"
-ln --verbose --symbolic "$(pwd)/src/http.d" "$(pwd)"
-ln --verbose --symbolic --force /etc/ssl/certs/ca-bundle.crt "$(pwd)/src/conf"

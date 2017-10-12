@@ -17,7 +17,7 @@ fi
 #
 if [ "$(ls /tmp/artifacts/ 2>/dev/null)" ]; then
   echo "---> Restoring build artifacts..."
-  cp -vr /tmp/artifacts/. /usr/local/openresty/luajit/
+  cp -vr /tmp/artifacts/. .
   rm -rf /tmp/artifacts/
 fi
 
@@ -26,14 +26,9 @@ cp -Rf /tmp/src/. ./
 
 echo "---> Building application from source..."
 
-cd /opt/app
+export PATH="/usr/local/openresty/luajit/bin/:${PATH}"
 
-if compgen -G "/tmp/src/*.rockspec" > /dev/null; then
-  cp /tmp/src/*.rockspec /opt/app/
-  find . -name "*.rockspec" -exec luarocks ${LUAROCKS_INSTALL:-make} {} \;
-fi
-
-if [ ! -e "$(pwd)/bin" ];
-then
-  ln -svf "$(pwd)/bin" "${HOME}"
+if [ -e "/tmp/src/Roverfile.lock" ]; then
+  echo "---> Installing dependencies"
+  rover install --roverfile /tmp/src/Roverfile --path .
 fi
