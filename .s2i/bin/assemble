@@ -32,3 +32,5 @@ if [ -e "/tmp/src/Roverfile.lock" ]; then
   echo "---> Installing dependencies"
   rover install --roverfile /tmp/src/Roverfile --path .
 fi
+
+ln --verbose --symbolic /etc/ssl/certs/ca-bundle.crt "$(pwd)/conf" || true
