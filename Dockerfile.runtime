@@ -27,7 +27,9 @@ LABEL io.openshift.s2i.scripts-url=image:///usr/libexec/s2i \
 COPY bin/ /usr/bin/
 COPY ./.s2i/bin/assemble* /usr/libexec/s2i/
 
-RUN ln -s /opt/app-root/src/scripts/run /usr/libexec/s2i/
+RUN ln -vs /opt/app-root/src/scripts/run /usr/libexec/s2i/ && \
+ openresty -t && \
+ chmod -vR g+w /usr/local/openresty/nginx/{*_temp,logs}
 
 # This default user is created in the openshift/base-centos7 image
 USER 1001

@@ -32,8 +32,6 @@ RUN yum clean all -y \
 # COPY ./<builder_folder>/ /opt/app/
 
 COPY config-*.lua /etc/luarocks/
-# override entrypoint to always setup luarocks paths
-RUN ln -sf /usr/libexec/s2i/entrypoint /usr/local/bin/container-entrypoint
 
 RUN \
   yum install -y luarocks && \
@@ -44,6 +42,11 @@ RUN \
   chmod g+w "${HOME}/.cache" && \
   rm -rf /var/cache/yum && yum clean all -y && \
   rm -rf "${HOME}/.cache/luarocks" ./*
+
+# override entrypoint to always setup luarocks paths
+RUN ln -sf /usr/libexec/s2i/entrypoint /usr/local/bin/container-entrypoint && \
+ openresty -t && openresty-debug -t && \
+ chmod -vR g+w /usr/local/openresty{,-*}/nginx/{*_temp,logs}
 
 COPY ./.s2i/bin/ /usr/libexec/s2i
 
