@@ -1,2 +1,16 @@
 #!/bin/bash
-exec "$@"
+set -euo pipefail
+IFS=$'\n\t'
+
+# s2i sets the default command to scripts/run.
+# Changing a directory would break that relative path.
+# So lets resolve it before changing the directory and use the absolute path.
+
+args=("$@")
+cmd="$(readlink -e "${args[0]}")" || true
+
+args[0]="${cmd:-${args[0]}}"
+
+cd "${HOME}" # change to home directory
+
+exec "${args[@]}"

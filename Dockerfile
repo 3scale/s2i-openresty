@@ -4,7 +4,6 @@ FROM openshift/base-centos7
 
 ARG OPENRESTY_RPM_VERSION="1.11.2.5"
 ARG LUAROCKS_VERSION="2.3.0"
-ENV AUTO_UPDATE_INTERVAL=0 BUILDER_VERSION=0.1
 
 LABEL io.k8s.description="Platform for building openresty" \
       io.k8s.display-name="s2i Openresty centos 7 - ${OPENRESTY_RPM_VERSION}" \
@@ -18,10 +17,8 @@ RUN yum clean all -y \
  && yum install -y epel-release \
  && yum upgrade -y \
  && yum install -y \
-        luarocks \
-        bind-utils \ 
         perl-Test-Nginx perl-JSON-WebToken \
-	perl-TAP-Harness-JUnit \
+        perl-TAP-Harness-JUnit \
         dnsmasq \
  && yum install -y \
         openresty-${OPENRESTY_RPM_VERSION} \
@@ -29,42 +26,37 @@ RUN yum clean all -y \
         openresty-debug-${OPENRESTY_RPM_VERSION} \
         openresty-openssl \
     && echo "Cleaning all dependencies" \
-    && yum clean all -y \
-    && mkdir -p /opt/app/logs /opt/app/conf \
-    && mkdir -p /usr/local/openresty/nginx \
-    && ln -s /opt/app/logs /usr/local/openresty/nginx/logs \
-    && ln -sf /dev/stdout /opt/app/logs/access.log \
-    && ln -sf /dev/stderr /opt/app/logs/error.log \
-    && ln -s /etc/ssl/certs/ca-bundle.crt /opt/app/conf
+    && yum clean all -y
 
 # TODO (optional): Copy the builder files into /opt/app
 # COPY ./<builder_folder>/ /opt/app/
 
-COPY ./.s2i/bin/ /usr/libexec/s2i
 COPY config-*.lua /etc/luarocks/
-ENV LUA_PATH=";;/usr/lib64/lua/5.1/?.lua" LUAROCKS_INSTALL=make
+
+RUN \
+  yum install -y luarocks && \
+  ln -s /usr/lib64/lua/5.1/luarocks /usr/share/lua/5.1/luarocks && \
+  luarocks install --server=http://luarocks.org/dev lua-rover && \
+  yum -y remove luarocks && \
+  mv /etc/luarocks/config-5.1.lua{.rpmsave,} && \
+  chmod g+w "${HOME}/.cache" && \
+  rm -rf /var/cache/yum && yum clean all -y && \
+  rm -rf "${HOME}/.cache/luarocks" ./*
 
 # override entrypoint to always setup luarocks paths
-RUN ln -sf /usr/libexec/s2i/entrypoint /usr/local/bin/container-entrypoint \
-    && ln -s /usr/lib64/lua/5.1/luarocks /usr/share/lua/5.1/luarocks
+RUN ln -sf /usr/libexec/s2i/entrypoint /usr/local/bin/container-entrypoint && \
+ openresty -t && openresty-debug -t && \
+ chmod -vR g+w /usr/local/openresty{,-*}/nginx/{*_temp,logs}
 
-#TODO: Drop the root user and make the content of /opt/app owned by user 1001
-RUN mkdir -p -v /opt/app/logs /opt/app/http.d /usr/local/openresty/luajit/lib/luarocks "${HOME}/.cache" \
- && chmod -v g+w /opt/app /opt/app/* \
-                 /usr/local/openresty/luajit/share/lua/5.1 \
-		 /usr/local/openresty/luajit/lib/lua/5.1 \
-		 /usr/local/openresty/luajit \
-                 /usr/local/openresty/luajit/lib/luarocks \
-		 /usr/local/openresty/luajit/bin/ \
-		 /usr/local/openresty/nginx/ \
-		 /usr/local/openresty/nginx/logs/ \
-		 "${HOME}/.cache"
+COPY ./.s2i/bin/ /usr/libexec/s2i
 
 # This default user is created in the openshift/base-centos7 image
 USER 1001
 
-RUN luarocks install --server=http://luarocks.org/dev lua-rover # 1
+ENV PATH="./lua_modules/bin:${PATH}" \
+ LUA_PATH="./lua_modules/share/lua/5.1/?.lua;./lua_modules/share/lua/5.1/?/init.lua;;" \
+ LUA_CPATH="./lua_modules/lib/lua/5.1/?.so;;"
 
-WORKDIR /opt/app/
+WORKDIR ${HOME}
 EXPOSE 8080
 CMD ["usage"]

@@ -3,10 +3,7 @@ FROM centos:centos7
 
 ARG OPENRESTY_RPM_VERSION="1.11.2.5"
 
-ENV \
-    BUILDER_VERSION=0.1 \
-    # The $HOME is not set by default, but some applications needs this variable
-    HOME=/opt/app-root/src \
+ENV HOME=/opt/app-root/src \
     PATH=/opt/app-root/src/bin:/opt/app-root/bin:$PATH
 
 RUN mkdir -p "${HOME}" && \
@@ -14,39 +11,25 @@ RUN mkdir -p "${HOME}" && \
           -c "Default Application User" default && \
     yum-config-manager --add-repo https://openresty.org/yum/centos/OpenResty.repo && \
     rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
-    yum install -y bind-utils tar dnsmasq && \
+    yum install -y tar dnsmasq && \
     yum install -y openresty-${OPENRESTY_RPM_VERSION} \
                    openresty-resty-${OPENRESTY_RPM_VERSION} \
                    openresty-openssl && \
-    yum clean all -y && \
-    mkdir /opt/app-root/src/logs && \
-    mkdir -p /usr/local/openresty/nginx && \
-    ln -s /opt/app-root/src/logs /usr/local/openresty/nginx/logs && \
-    ln -s /dev/stdout /opt/app-root/src/logs/access.log && \
-    ln -s /dev/stderr /opt/app-root/src/logs/error.log && \
-    mkdir -p /usr/local/share/lua/ && \
-    chmod g+w /usr/local/share/lua/ && \
-    chown -R 1001:0 /opt/app-root /usr/local/share/lua/ \
-		 /usr/local/openresty/nginx/ \
-		 /usr/local/openresty/nginx/logs/ && \
-    ln -s /opt/app-root/app /opt/app
+    yum clean all
 
-LABEL \
-      # Location of the STI scripts inside the image.
-      io.openshift.s2i.scripts-url=image:///usr/libexec/s2i \
+LABEL io.openshift.s2i.scripts-url=image:///usr/libexec/s2i \
       io.k8s.description="Platform for building openresty" \
       io.k8s.display-name="s2i Openresty centos 7 - ${OPENRESTY_RPM_VERSION}"\
       io.openshift.expose-services="8080:http" \
-      io.openshift.s2i.assemble-input-files="/usr/local/openresty/luajit/share;/opt/app" \
+      io.openshift.s2i.assemble-input-files="/opt/app-root/src" \
       io.openshift.tags="builder,s2i,openresty"
 
 COPY bin/ /usr/bin/
 COPY ./.s2i/bin/assemble* /usr/libexec/s2i/
 
-#TODO: Drop the root user and make the content of /opt/app owned by user 1001
-RUN mkdir -p "${HOME}/logs" "${HOME}/http.d" && \
-    chmod g+w "${HOME}" "${HOME}"/* "${HOME}/http.d" && \
-    ln -s /opt/app-root/scripts/run /usr/libexec/s2i/
+RUN ln -vs /opt/app-root/src/scripts/run /usr/libexec/s2i/ && \
+ openresty -t && \
+ chmod -vR g+w /usr/local/openresty/nginx/{*_temp,logs}
 
 # This default user is created in the openshift/base-centos7 image
 USER 1001
@@ -54,6 +37,10 @@ USER 1001
 EXPOSE 8080
 
 WORKDIR /opt/app-root
+
+ENV PATH="./lua_modules/bin:${PATH}" \
+ LUA_PATH="./lua_modules/share/lua/5.1/?.lua;./lua_modules/share/lua/5.1/?/init.lua;;" \
+ LUA_CPATH="./lua_modules/lib/lua/5.1/?.so;;"
 
 ENTRYPOINT ["container-entrypoint"]
 CMD ["/usr/libexec/s2i/usage"]
