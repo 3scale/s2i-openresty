@@ -173,7 +173,7 @@ test_config() {
   local cid=$1
   echo "Testing nginx config ..."
 
-  test=$(docker exec $(cat ${cid}) container-entrypoint bin/apicast --test)
+  test=$(docker exec $(cat ${cid}) container-entrypoint openresty -t -c /opt/app-root/src/conf/nginx.conf)
 
   return $?
 }

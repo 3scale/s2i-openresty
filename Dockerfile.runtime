@@ -31,6 +31,10 @@ RUN ln -vs /opt/app-root/src/scripts/run /usr/libexec/s2i/ && \
  openresty -t && \
  chmod -vR g+w /usr/local/openresty/nginx/{*_temp,logs}
 
+# in case someone needs to use rover/luarocks in runtime
+COPY site_config.lua /usr/share/lua/5.1/luarocks/site_config.lua
+COPY config-*.lua /usr/local/openresty/config-5.1.lua
+
 # This default user is created in the openshift/base-centos7 image
 USER 1001
 
@@ -38,7 +42,7 @@ EXPOSE 8080
 
 WORKDIR /opt/app-root
 
-ENV PATH="./lua_modules/bin:${PATH}" \
+ENV PATH="./lua_modules/bin:/usr/local/openresty/luajit/bin/:${PATH}" \
  LUA_PATH="./lua_modules/share/lua/5.1/?.lua;./lua_modules/share/lua/5.1/?/init.lua;;" \
  LUA_CPATH="./lua_modules/lib/lua/5.1/?.so;;"
 

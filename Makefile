@@ -1,15 +1,15 @@
 TAG ?= latest
 IMAGE_NAME ?= s2i-openresty-centos7:$(TAG)
-FORCE_PULL ?= --pull
+DOCKER_OPTIONS ?= --pull
 REGISTRY ?= quay.io/3scale
 
 CANDIDATE_IMAGE_NAME ?= $(IMAGE_NAME)-candidate
 
 build: ## Build builder image
-	docker build $(FORCE_PULL) --tag $(IMAGE_NAME) .
+	docker build $(DOCKER_OPTIONS) --tag $(IMAGE_NAME) .
 
 build-runtime: ## Build runtime image
-	docker build $(FORCE_PULL) --tag $(IMAGE_NAME)-runtime -f Dockerfile.runtime .
+	docker build $(DOCKER_OPTIONS) --tag $(IMAGE_NAME)-runtime -f Dockerfile.runtime .
 
 .PHONY: test test/test-app
 
@@ -20,12 +20,15 @@ test/test-app:
 bash: ## Run bash in built builder image
 	docker run -it --user root $(IMAGE_NAME) bash
 
-push: ## Tag and push the builder image to the docker registry
-	docker tag $(IMAGE_NAME) $(REGISTRY)/$(IMAGE_NAME)
-	docker push $(REGISTRY)/$(IMAGE_NAME)
+release: DOCKER_OPTIONS = --no-cache --pull
+release: build build-runtime
 
-push-runtime: ## Tag and push the runtime iamge to the docker registry
+tag:  ## Tag both builder and runtime image with the docker registry
+	docker tag $(IMAGE_NAME) $(REGISTRY)/$(IMAGE_NAME)
 	docker tag $(IMAGE_NAME)-runtime $(REGISTRY)/$(IMAGE_NAME)-runtime
+
+push: ## Push both builder and runtime image to the docker registry
+	docker push $(REGISTRY)/$(IMAGE_NAME)
 	docker push $(REGISTRY)/$(IMAGE_NAME)-runtime
 
 test: ## Run tests

@@ -31,17 +31,22 @@ RUN yum clean all -y \
 # TODO (optional): Copy the builder files into /opt/app
 # COPY ./<builder_folder>/ /opt/app/
 
-COPY config-*.lua /etc/luarocks/
+COPY site_config.lua /usr/share/lua/5.1/luarocks/site_config.lua
+COPY config-*.lua /usr/local/openresty/config-5.1.lua
+
+ENV PATH="./lua_modules/bin:/usr/local/openresty/luajit/bin/:${PATH}" \
+ LUA_PATH="./lua_modules/share/lua/5.1/?.lua;./lua_modules/share/lua/5.1/?/init.lua;;" \
+ LUA_CPATH="./lua_modules/lib/lua/5.1/?.so;;"
 
 RUN \
   yum install -y luarocks && \
-  ln -s /usr/lib64/lua/5.1/luarocks /usr/share/lua/5.1/luarocks && \
   luarocks install --server=http://luarocks.org/dev lua-rover && \
+  rover -v && \
   yum -y remove luarocks && \
-  mv /etc/luarocks/config-5.1.lua{.rpmsave,} && \
   chmod g+w "${HOME}/.cache" && \
   rm -rf /var/cache/yum && yum clean all -y && \
   rm -rf "${HOME}/.cache/luarocks" ./*
+
 
 # override entrypoint to always setup luarocks paths
 RUN ln -sf /usr/libexec/s2i/entrypoint /usr/local/bin/container-entrypoint && \
@@ -52,10 +57,6 @@ COPY ./.s2i/bin/ /usr/libexec/s2i
 
 # This default user is created in the openshift/base-centos7 image
 USER 1001
-
-ENV PATH="./lua_modules/bin:${PATH}" \
- LUA_PATH="./lua_modules/share/lua/5.1/?.lua;./lua_modules/share/lua/5.1/?/init.lua;;" \
- LUA_CPATH="./lua_modules/lib/lua/5.1/?.so;;"
 
 WORKDIR ${HOME}
 EXPOSE 8080

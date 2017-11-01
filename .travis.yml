@@ -28,5 +28,5 @@ script:
 after_success:
 - if [ -n "${TRAVIS_BRANCH}" -a "${TRAVIS_PULL_REQUEST}" = "false" ] || [ -n "${TRAVIS_TAG}" ]; then
   docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" quay.io;
-  make push push-runtime;
+  make tag push;
   fi

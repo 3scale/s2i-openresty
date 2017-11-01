@@ -26,8 +26,6 @@ cp -Rf /tmp/src/. ./
 
 echo "---> Building application from source..."
 
-export PATH="/usr/local/openresty/luajit/bin/:${PATH}"
-
 if [ -e "/tmp/src/Roverfile.lock" ]; then
   echo "---> Installing dependencies"
   rover install --roverfile /tmp/src/Roverfile --path .
