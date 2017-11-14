@@ -96,11 +96,19 @@ run_runtime_test_application() {
   docker run --user 100002 --rm --cidfile=${runtime_cid_file} -p ${test_port} --env THREESCALE_PORTAL_ENDPOINT=http://127.0.0.1 ${IMAGE_NAME}-runtime-testapp "$@"
 }
 
+start_runtime_test_application() {
+  cleanup_runtime
+
+  run_runtime_test_application "$@" &
+  wait_for_cid ${runtime_cid_file}
+}
+
 cleanup() {
   if [ -f $cid_file ]; then
     if container_exists; then
       docker stop $(cat $cid_file)
     fi
+    rm "$cid_file"
   fi
 }
 
@@ -115,6 +123,7 @@ cleanup_runtime() {
     if runtime_container_exists; then
       docker stop $(cat ${runtime_cid_file})
     fi
+    rm "${runtime_cid_file}"
   fi
 }
 
@@ -234,14 +243,16 @@ check_result $?
 
 cleanup
 
-run_runtime_test_application &
-
-wait_for_cid ${runtime_cid_file}
+start_runtime_test_application
 
 test_connection ${runtime_cid_file}
 check_result $?
 
 test_top ${runtime_cid_file}
+check_result $?
+
+start_runtime_test_application /usr/libexec/s2i/run
+test_connection ${runtime_cid_file}
 check_result $?
 
 cleanup_runtime
