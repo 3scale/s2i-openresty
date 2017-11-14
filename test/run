@@ -68,6 +68,9 @@ prepare_runtime() {
 }
 
 prepare() {
+  cleanup_image
+  cleanup_runtime_image
+
   if ! image_exists ${IMAGE_NAME}; then
     echo "ERROR: The image ${IMAGE_NAME} must exist before this script is executed."
     exit 1
@@ -99,6 +102,9 @@ cleanup() {
       docker stop $(cat $cid_file)
     fi
   fi
+}
+
+cleanup_image() {
   if image_exists ${IMAGE_NAME}-testapp; then
     docker rmi ${IMAGE_NAME}-testapp
   fi
@@ -110,6 +116,9 @@ cleanup_runtime() {
       docker stop $(cat ${runtime_cid_file})
     fi
   fi
+}
+
+cleanup_runtime_image() {
   if image_exists ${IMAGE_NAME}-runtime-testapp; then
     docker rmi ${IMAGE_NAME}-runtime-testapp
   fi
