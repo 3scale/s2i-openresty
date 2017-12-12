@@ -31,4 +31,10 @@ if [ -e "/tmp/src/Roverfile.lock" ]; then
   rover install --roverfile /tmp/src/Roverfile --path .
 fi
 
+if [ -e "/tmp/src/cpanfile" ]; then
+  echo "---> Installing Perl dependencies"
+  cpanm --installdeps /tmp/src
+  rm -rf ~/.cpanm
+fi
+
 ln --verbose --symbolic /etc/ssl/certs/ca-bundle.crt "$(pwd)/conf" || true
