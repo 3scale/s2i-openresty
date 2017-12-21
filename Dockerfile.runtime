@@ -15,7 +15,9 @@ RUN mkdir -p "${HOME}" && \
     yum install -y openresty-${OPENRESTY_RPM_VERSION} \
                    openresty-resty-${OPENRESTY_RPM_VERSION} \
                    openresty-openssl && \
-    yum clean all
+    yum clean all && \
+    ln -sf /dev/stdout /usr/local/openresty/nginx/logs/access.log && \
+    ln -sf /dev/stderr /usr/local/openresty/nginx/logs/error.log
 
 LABEL io.openshift.s2i.scripts-url=image:///usr/libexec/s2i \
       io.k8s.description="Platform for building openresty" \

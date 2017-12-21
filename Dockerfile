@@ -26,7 +26,9 @@ RUN yum clean all -y \
         openresty-debug-${OPENRESTY_RPM_VERSION} \
         openresty-openssl \
     && echo "Cleaning all dependencies" \
-    && yum clean all -y
+    && yum clean all -y \
+    && ln -sf /dev/stdout /usr/local/openresty/nginx/logs/access.log \
+    && ln -sf /dev/stderr /usr/local/openresty/nginx/logs/error.log
 
 # TODO (optional): Copy the builder files into /opt/app
 # COPY ./<builder_folder>/ /opt/app/
