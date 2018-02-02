@@ -53,11 +53,11 @@ container_ip() {
 }
 
 run_s2i_build() {
-  s2i build --context-dir=apicast --incremental=true ${s2i_args} ${test_app} ${IMAGE_NAME} ${IMAGE_NAME}-testapp
+  s2i build --context-dir=gateway --incremental=true ${s2i_args} ${test_app} ${IMAGE_NAME} ${IMAGE_NAME}-testapp
 }
 
 run_s2i_runtime_build() {
-  s2i build --context-dir=apicast ${s2i_args} --runtime-image=${IMAGE_NAME}-runtime ${test_app} ${IMAGE_NAME} ${IMAGE_NAME}-runtime-testapp
+  s2i build --context-dir=gateway ${s2i_args} --runtime-image=${IMAGE_NAME}-runtime ${test_app} ${IMAGE_NAME} ${IMAGE_NAME}-runtime-testapp
 }
 
 prepare_runtime() {
@@ -79,7 +79,7 @@ prepare() {
   pushd ${test_dir}/test-app >/dev/null
 
   # made the .git a symlink, see https://github.com/openshift/source-to-image/issues/606
-  if ! [ -d .git/objects ]; then
+  if ! [ -e .git ]; then
     echo "ERROR: Expected ${test_dir}/test-app to be a git repository."
     exit 1
   fi
@@ -191,7 +191,7 @@ test_config() {
   local cid=$1
   echo "Testing nginx config ..."
 
-  test=$(docker exec $(cat ${cid}) container-entrypoint openresty -t -c /opt/app-root/src/conf/nginx.conf)
+  test=$(docker exec $(cat ${cid}) container-entrypoint apicast --test)
 
   return $?
 }

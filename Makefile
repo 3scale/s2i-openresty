@@ -15,8 +15,6 @@ build-runtime: ## Build runtime image
 
 test/test-app:
 	git submodule update --init --recursive $@
-	rm "$@/.git"
-	ln -sfv ../../.git/modules/$@ "$@/.git"
 bash: ## Run bash in built builder image
 	docker run -it --user root $(IMAGE_NAME) bash
 
