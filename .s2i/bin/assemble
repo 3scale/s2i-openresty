@@ -28,7 +28,7 @@ echo "---> Building application from source..."
 
 if [ -e "/tmp/src/Roverfile.lock" ]; then
   echo "---> Installing dependencies"
-  rover install --roverfile /tmp/src/Roverfile --path .
+  rover install --roverfile /tmp/src/Roverfile --path . --without development test
 fi
 
 if [ -e "/tmp/src/cpanfile" ]; then
