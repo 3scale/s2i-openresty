@@ -53,11 +53,11 @@ container_ip() {
 }
 
 run_s2i_build() {
-  s2i build --context-dir=apicast --incremental=true ${s2i_args} ${test_app} ${IMAGE_NAME} ${IMAGE_NAME}-testapp
+  s2i build --context-dir=gateway --incremental=true ${s2i_args} ${test_app} ${IMAGE_NAME} ${IMAGE_NAME}-testapp
 }
 
 run_s2i_runtime_build() {
-  s2i build --context-dir=apicast ${s2i_args} --runtime-image=${IMAGE_NAME}-runtime ${test_app} ${IMAGE_NAME} ${IMAGE_NAME}-runtime-testapp
+  s2i build --context-dir=gateway ${s2i_args} --runtime-image=${IMAGE_NAME}-runtime ${test_app} ${IMAGE_NAME} ${IMAGE_NAME}-runtime-testapp
 }
 
 prepare_runtime() {
@@ -79,7 +79,7 @@ prepare() {
   pushd ${test_dir}/test-app >/dev/null
 
   # made the .git a symlink, see https://github.com/openshift/source-to-image/issues/606
-  if ! [ -d .git/objects ]; then
+  if ! [ -e .git ]; then
     echo "ERROR: Expected ${test_dir}/test-app to be a git repository."
     exit 1
   fi
@@ -89,10 +89,12 @@ prepare() {
 }
 
 run_test_application() {
+  set -o xtrace
   docker run --user 100001 --rm --cidfile=${cid_file} -p ${test_port} --env THREESCALE_PORTAL_ENDPOINT=http://127.0.0.1 ${IMAGE_NAME}-testapp "$@"
 }
 
 run_runtime_test_application() {
+  set -o xtrace
   docker run --user 100002 --rm --cidfile=${runtime_cid_file} -p ${test_port} --env THREESCALE_PORTAL_ENDPOINT=http://127.0.0.1 ${IMAGE_NAME}-runtime-testapp "$@"
 }
 
@@ -191,7 +193,7 @@ test_config() {
   local cid=$1
   echo "Testing nginx config ..."
 
-  test=$(docker exec $(cat ${cid}) container-entrypoint openresty -t -c /opt/app-root/src/conf/nginx.conf)
+  test=$(docker exec $(cat ${cid}) container-entrypoint apicast --test)
 
   return $?
 }
