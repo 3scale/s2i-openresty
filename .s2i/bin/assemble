@@ -37,4 +37,4 @@ if [ -e "/tmp/src/cpanfile" ]; then
   rm -rf ~/.cpanm
 fi
 
-ln --verbose --symbolic /etc/ssl/certs/ca-bundle.crt "$(pwd)/conf" || true
+ln --verbose --symbolic /etc/ssl/certs/ca-bundle.crt "$(pwd)/conf" 2>/dev/null || true
