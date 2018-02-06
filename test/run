@@ -198,6 +198,15 @@ test_config() {
   return $?
 }
 
+test_temp() {
+  local cid=$1
+  echo "Testing nginx temp directory ..."
+
+  test=$(docker exec --user 1000001 $(cat ${cid}) touch /usr/local/openresty/nginx/client_body_temp/test)
+
+  return $?
+}
+
 test_top() {
   local cid=$1
   local id=$(cat ${cid})
@@ -238,6 +247,9 @@ test_connection ${cid_file}
 check_result $?
 
 test_config ${cid_file}
+check_result $?
+
+test_temp ${cid_file}
 check_result $?
 
 test_top ${cid_file}

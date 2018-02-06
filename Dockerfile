@@ -53,7 +53,7 @@ RUN \
 # override entrypoint to always setup luarocks paths
 RUN ln -sf /usr/libexec/s2i/entrypoint /usr/local/bin/container-entrypoint && \
  openresty -t && openresty-debug -t && \
- chmod -vR g+w /usr/local/openresty{,-*}/nginx/{*_temp,logs}
+ chmod -vR g+wrX /usr/local/openresty{,-*}/nginx/{*_temp,logs}
 
 COPY ./.s2i/bin/ /usr/libexec/s2i
 
