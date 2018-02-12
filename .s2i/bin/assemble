@@ -33,7 +33,7 @@ fi
 
 if [ -e "/tmp/src/cpanfile" ]; then
   echo "---> Installing Perl dependencies"
-  cpanm --installdeps /tmp/src
+  cpanm --notest --installdeps /tmp/src
   rm -rf ~/.cpanm
 fi
 
