@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: Template
+labels:
+metadata:
+  annotations:
+    openshift.io/display-name: OpenResty S2I Builder
+  name: s2i-openresty
+parameters:
+- description: The OpenResty S2I GIT repository to use.
+  displayName: GIT Repo URL
+  name: GIT_REPO
+  value: https://github.com/3scale/s2i-openresty.git
+
+- description: The GIT reference (branch/tag) to use.
+  displayName: GIT Reference
+  name: GIT_REF
+  value: master
+
+- description: The base image to use
+  displayName: Base Image
+  name: BASE_IMAGE
+  value: openshift/base-centos7
+
+objects:
+
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: s2i-openresty
+  spec:
+
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: openresty-base-image
+  spec:
+    tags:
+    - from:
+        kind: DockerImage
+        name: ${BASE_IMAGE}
+      importPolicy:
+        scheduled: true
+      name: latest
+
+
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: s2i-openresty-builder
+  spec:
+    successfulBuildsHistoryLimit: 1
+    failedBuildsHistoryLimit: 1
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: s2i-openresty:builder
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      git:
+        uri: "${GIT_REPO}"
+        ref: "${GIT_REF}"
+      type: Git
+    strategy:
+      dockerStrategy:
+        dockerfilePath: Dockerfile
+        from:
+          kind: ImageStreamTag
+          name: openresty-base-image:latest
+      type: Docker
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: s2i-openresty-runtime
+  spec:
+    successfulBuildsHistoryLimit: 1
+    failedBuildsHistoryLimit: 1
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: s2i-openresty:runtime
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      git:
+        uri: "${GIT_REPO}"
+        ref: "${GIT_REF}"
+      type: Git
+    strategy:
+      dockerStrategy:
+        dockerfilePath: Dockerfile.runtime
+        from:
+          kind: ImageStreamTag
+          name: openresty-base-image:latest
+      type: Docker
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
