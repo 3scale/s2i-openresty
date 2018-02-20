@@ -3,5 +3,5 @@
 if [ -f /tmp/scripts/run ]; then 
 	exec /tmp/scripts/run "$@"
 else
-	exec openresty -c "$(pwd)/conf/nginx.conf" -g "daemon off; error_log stderr ${LOG_LEVEL:=warn};";
+	exec openresty -c "$(pwd)/conf/nginx.conf" -g "daemon off; error_log stderr ${LOG_LEVEL:=warn};" "$@"
 fi
