@@ -4,17 +4,21 @@ FROM centos:centos7
 ARG OPENRESTY_RPM_VERSION="1.13.6.1"
 
 ENV HOME=/opt/app-root/src \
-    PATH=/opt/app-root/src/bin:/opt/app-root/bin:$PATH
+    PATH=/opt/app-root/src/bin:/opt/app-root/bin:$PATH \
+    LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/app-root/lib"
+
+COPY scripts/build-opentracing.sh /tmp/build-opentracing.sh
 
 RUN mkdir -p "${HOME}" && \
     useradd -u 1001 -r -g 0 -d ${HOME} -s /sbin/nologin \
-          -c "Default Application User" default && \
+            -c "Default Application User" default && \
     yum-config-manager --add-repo https://openresty.org/yum/centos/OpenResty.repo && \
     rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
     yum install -y tar dnsmasq && \
     yum install -y openresty-${OPENRESTY_RPM_VERSION} \
                    openresty-resty-${OPENRESTY_RPM_VERSION} \
                    openresty-openssl && \
+    /tmp/build-opentracing.sh && \
     yum clean all && \
     ln -sf /dev/stdout /usr/local/openresty/nginx/logs/access.log && \
     ln -sf /dev/stderr /usr/local/openresty/nginx/logs/error.log

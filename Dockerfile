@@ -26,7 +26,7 @@ RUN yum clean all -y \
         openresty-debug-${OPENRESTY_RPM_VERSION} \
         openresty-openssl \
     && echo "Cleaning all dependencies" \
-    && yum clean all -y \
+    &&  yum clean all -y \
     && ln -sf /dev/stdout /usr/local/openresty/nginx/logs/access.log \
     && ln -sf /dev/stderr /usr/local/openresty/nginx/logs/error.log
 
@@ -37,8 +37,9 @@ COPY site_config.lua /usr/share/lua/5.1/luarocks/site_config.lua
 COPY config-*.lua /usr/local/openresty/config-5.1.lua
 
 ENV PATH="./lua_modules/bin:/usr/local/openresty/luajit/bin/:${PATH}" \
- LUA_PATH="./lua_modules/share/lua/5.1/?.lua;./lua_modules/share/lua/5.1/?/init.lua;;" \
- LUA_CPATH="./lua_modules/lib/lua/5.1/?.so;;"
+    LUA_PATH="./lua_modules/share/lua/5.1/?.lua;./lua_modules/share/lua/5.1/?/init.lua;;" \
+    LUA_CPATH="./lua_modules/lib/lua/5.1/?.so;;" \
+    LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/app-root/lib"
 
 RUN \
   yum install -y luarocks && \
@@ -49,6 +50,8 @@ RUN \
   rm -rf /var/cache/yum && yum clean all -y && \
   rm -rf "${HOME}/.cache/luarocks" ./*
 
+COPY scripts/build-opentracing.sh /tmp/build-opentracing.sh
+RUN /tmp/build-opentracing.sh
 
 # override entrypoint to always setup luarocks paths
 RUN ln -sf /usr/libexec/s2i/entrypoint /usr/local/bin/container-entrypoint && \
