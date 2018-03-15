@@ -90,12 +90,12 @@ prepare() {
 
 run_test_application() {
   set -o xtrace
-  docker run --user 100001 --rm --cidfile=${cid_file} -p ${test_port} --env THREESCALE_PORTAL_ENDPOINT=http://127.0.0.1 ${IMAGE_NAME}-testapp "$@"
+  docker run --user 100001 --rm --cidfile=${cid_file} -p ${test_port} --env APICAST_ENVIRONMENT=staging --env THREESCALE_PORTAL_ENDPOINT=http://127.0.0.1 ${IMAGE_NAME}-testapp "$@"
 }
 
 run_runtime_test_application() {
   set -o xtrace
-  docker run --user 100002 --rm --cidfile=${runtime_cid_file} -p ${test_port} --env THREESCALE_PORTAL_ENDPOINT=http://127.0.0.1 ${IMAGE_NAME}-runtime-testapp "$@"
+  docker run --user 100002 --rm --cidfile=${runtime_cid_file} -p ${test_port} --env APICAST_ENVIRONMENT=staging --env THREESCALE_PORTAL_ENDPOINT=http://127.0.0.1 ${IMAGE_NAME}-runtime-testapp "$@"
 }
 
 start_runtime_test_application() {
