@@ -4,4 +4,9 @@ set -eo pipefail
 
 eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib 2>/dev/null)"
 
-exec "$@"
+if [[ "$1" == '-c' ]]; then # running as shell
+	shift
+	eval "$@"
+else
+	exec "$@"
+fi
