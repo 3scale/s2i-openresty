@@ -2,13 +2,14 @@
 
 yum install -y centos-release-scl epel-release
 
+yum install -y thrift GeoIP libxml2 libxslt gd
+
 yum install -y \
         openresty-openssl-devel \
         openresty-pcre-devel \
-        devtoolset-7 thrift-devel \
-        GeoIP-devel systemtap-sdt-devel \
-        git libxml2-devel libxslt-devel \
-        gd-devel cmake3
+        git devtoolset-7 cmake3 thrift-devel GeoIP-devel \
+        systemtap-sdt-devel libxml2-devel libxslt-devel\
+        gd-devel
 
 # Source the devtoolset-7, building tools (gcc...)
 # Sourced before the fail modes due to an unbound variable in the script
@@ -104,3 +105,7 @@ mv -f /usr/local/lib/libopentracing* ${LIBDIR}
 # clean
 rm -rf "${TEMP:?}/*"
 rm -rf ~/.hunter
+
+yum history undo last -y
+
+yum clean all -y
