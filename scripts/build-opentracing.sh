@@ -20,9 +20,9 @@ IFS=$'\n\t'
 
 TEMP=$(mktemp -d)
 LIBDIR="/opt/app-root/lib"
-OPENTRACING_CPP_VERSION=v1.2.0
+OPENTRACING_CPP_VERSION=v1.3.0
 NGINX_OPENTRACING_VERSION=v0.2.1
-JAEGER_CPP_VERSION=v0.2.0
+JAEGER_CPP_VERSION=v0.3.0
 OPENRESTY_MD5="637f82d0b36c74aec1c01bd3b8e0289c"
 
 curl --retry-delay 5 --retry 3 -s -L https://openresty.org/download/openresty-"${OPENRESTY_RPM_VERSION}".tar.gz -o "${TEMP}/openresty.tar.gz"
