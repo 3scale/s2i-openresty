@@ -2,14 +2,14 @@
 
 yum install -y centos-release-scl epel-release
 
-yum install -y thrift GeoIP libxml2 libxslt gd
+yum install -y thrift GeoIP libxml2 libxslt gd yaml-cpp
 
 yum install -y \
         openresty-openssl-devel \
         openresty-pcre-devel \
         git devtoolset-7 cmake3 thrift-devel GeoIP-devel \
         systemtap-sdt-devel libxml2-devel libxslt-devel\
-        gd-devel
+        gd-devel yaml-cpp-devel
 
 # Source the devtoolset-7, building tools (gcc...)
 # Sourced before the fail modes due to an unbound variable in the script
@@ -45,7 +45,7 @@ make install
 cd "${TEMP}/jaeger-cpp"
 mkdir .build
 cd .build
-cmake3 -DBUILD_SHARED_LIBS=1 -DCMAKE_BUILD_TYPE=Release -DJAEGERTRACING_WITH_YAML_CPP=OFF -DBUILD_TESTING=OFF ..
+cmake3 -DCMAKE_BUILD_TYPE=Release ..
 make -j"$(nproc)"
 make install
 
@@ -85,8 +85,7 @@ cd "${TEMP}/openresty-${OPENRESTY_RPM_VERSION}"
             --with-stream \
             --with-stream_ssl_module \
             --with-threads \
-            --add-dynamic-module="${TEMP}/nginx-opentracing/opentracing" \
-            --add-dynamic-module="${TEMP}/nginx-opentracing/jaeger"
+            --add-dynamic-module="${TEMP}/nginx-opentracing/opentracing"
 
 make -j"$(nproc)"
 
@@ -95,7 +94,6 @@ cd "${TEMP}/openresty-${OPENRESTY_RPM_VERSION}/build/nginx-1.13.6/" && make modu
 # Move modules to another dir.
 mkdir ~/nginx-modules/
 cp objs/ngx_http_opentracing_module.so ~/nginx-modules/
-cp objs/ngx_http_jaeger_module.so ~/nginx-modules/
 
 # Move libraries
 mkdir ${LIBDIR}
