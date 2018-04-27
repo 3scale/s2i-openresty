@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
 
 yum install -y centos-release-scl epel-release
-
-yum install -y thrift GeoIP libxml2 libxslt gd yaml-cpp
+yum install -y GeoIP libxml2 libxslt gd
 
 yum install -y \
         openresty-openssl-devel \
         openresty-pcre-devel \
-        git devtoolset-7 cmake3 thrift-devel GeoIP-devel \
-        systemtap-sdt-devel libxml2-devel libxslt-devel\
-        gd-devel yaml-cpp-devel
+        git devtoolset-7-gcc-c++ cmake3 make GeoIP-devel \
+	libxml2-devel libxslt-devel gd-devel \
 
 # Source the devtoolset-7, building tools (gcc...)
 # Sourced before the fail modes due to an unbound variable in the script
@@ -18,11 +16,13 @@ source scl_source enable devtoolset-7
 set -euo pipefail
 IFS=$'\n\t'
 
-TEMP=$(mktemp -d)
-LIBDIR="/opt/app-root/lib"
-OPENTRACING_CPP_VERSION=v1.3.0
-NGINX_OPENTRACING_VERSION=v0.3.0
-JAEGER_CPP_VERSION=v0.3.0
+TEMP="$(mktemp -d)"
+export HUNTER_ROOT="${TEMP:-.}/.hunter"
+ROOT='/opt/app-root/'
+
+OPENTRACING_CPP_VERSION="v1.3.0"
+NGINX_OPENTRACING_VERSION="v0.3.0"
+JAEGER_CPP_VERSION="v0.3.0"
 OPENRESTY_MD5="637f82d0b36c74aec1c01bd3b8e0289c"
 
 curl --retry-delay 5 --retry 3 -s -L https://openresty.org/download/openresty-"${OPENRESTY_RPM_VERSION}".tar.gz -o "${TEMP}/openresty.tar.gz"
@@ -37,26 +37,19 @@ git clone -b "${JAEGER_CPP_VERSION}" https://github.com/jaegertracing/cpp-client
 cd "${TEMP}/opentracing"
 mkdir .build
 cd .build
-cmake3 -DBUILD_SHARED_LIBS=1 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF ..
-make -j"$(nproc)"
-make install
-
-# Let's Build jaeger-cpp client
-cd "${TEMP}/jaeger-cpp"
-mkdir .build
-cd .build
-cmake3 -DCMAKE_BUILD_TYPE=Release ..
+cmake3 -DBUILD_SHARED_LIBS=1 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF .. \
+	-DCMAKE_INSTALL_PREFIX:PATH=$ROOT
 make -j"$(nproc)"
 make install
 
 #Let's build dynamic modules for opentracing and jaeger, to keep
 #binary compatibility with the openresty installed from the RPM
 #we need to configure it the same way.
-cd "${TEMP}/openresty-${OPENRESTY_RPM_VERSION}"
+pushd "${TEMP}/openresty-${OPENRESTY_RPM_VERSION}"
 
 ./configure -j"$(nproc)" \
-            --with-cc-opt="-I/usr/local/openresty/openssl/include/ -I/usr/local/openresty/pcre/include/" \
-            --with-ld-opt="-L/usr/local/openresty/openssl/lib/ -L/usr/local/openresty/pcre/lib/" \
+            --with-cc-opt="-I/usr/local/openresty/openssl/include/ -I/usr/local/openresty/pcre/include/ -I$ROOT/include" \
+	    --with-ld-opt="-L/usr/local/openresty/openssl/lib/ -L/usr/local/openresty/pcre/lib/ -L$ROOT/lib" \
             --with-file-aio \
             --with-http_addition_module \
             --with-http_auth_request_module \
@@ -87,22 +80,28 @@ cd "${TEMP}/openresty-${OPENRESTY_RPM_VERSION}"
             --with-threads \
             --add-dynamic-module="${TEMP}/nginx-opentracing/opentracing"
 
+pushd "build/nginx-1.13.6/"
+make modules
+
+for openresty in /usr/local/openresty* ; do
+	mkdir -vp "$openresty/nginx/modules"
+	for module in  objs/ngx_*_module.so ; do
+		"$openresty/nginx/sbin/nginx" -t -q -g "load_module $(pwd)/$module;"
+		cp -v "$module" "$openresty/nginx/modules"
+	done
+done
+
+# Let's Build jaeger-cpp client
+cd "${TEMP}/jaeger-cpp"
+mkdir .build
+cd .build
+cmake3 -DCMAKE_BUILD_TYPE=Release .. \
+	-DCMAKE_INSTALL_PREFIX:PATH=$ROOT
 make -j"$(nproc)"
-
-cd "${TEMP}/openresty-${OPENRESTY_RPM_VERSION}/build/nginx-1.13.6/" && make modules
-
-# Move modules to another dir.
-mkdir ~/nginx-modules/
-cp objs/ngx_http_opentracing_module.so ~/nginx-modules/
-
-# Move libraries
-mkdir ${LIBDIR}
-mv -f /usr/local/lib/libjaeger* ${LIBDIR}
-mv -f /usr/local/lib/libopentracing* ${LIBDIR}
+make install
 
 # clean
-rm -rf "${TEMP:?}/*"
-rm -rf ~/.hunter
+rm -rf "${HUNTER_ROOT}" "${TEMP}" "${BASH_SOURCE[0]}"
 
 yum history undo last -y
 
