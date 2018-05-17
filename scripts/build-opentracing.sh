@@ -3,10 +3,9 @@
 yum install -y centos-release-scl epel-release
 yum install -y GeoIP libxml2 libxslt gd
 
+yum-builddep -y "openresty-${OPENRESTY_RPM_VERSION}"
 yum install -y \
-        openresty-openssl-devel \
-        openresty-pcre-devel \
-        git devtoolset-7-gcc-c++ cmake3 make GeoIP-devel \
+        git devtoolset-7-gcc-c++ cmake3 GeoIP-devel \
 	libxml2-devel libxslt-devel gd-devel \
 
 # Source the devtoolset-7, building tools (gcc...)
@@ -103,6 +102,6 @@ make install
 # clean
 rm -rf "${HUNTER_ROOT}" "${TEMP}" "${BASH_SOURCE[0]}"
 
-yum history undo last -y
+yum history rollback last-2 -y
 
 yum clean all -y
