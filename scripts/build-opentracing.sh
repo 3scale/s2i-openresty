@@ -19,11 +19,12 @@ TEMP="$(mktemp -d)"
 export HUNTER_ROOT="${TEMP:-.}/.hunter"
 ROOT='/opt/app-root/'
 
-OPENTRACING_CPP_VERSION="v1.3.0"
+OPENTRACING_CPP_VERSION="v1.4.2"
 NGINX_OPENTRACING_VERSION="v0.3.0"
-JAEGER_CPP_VERSION="v0.3.0"
+JAEGER_CPP_VERSION="v0.4.1"
 OPENRESTY_MD5="d95bc4bbe15e4b045a0593b4ecc0db38"
 
+echo "Downloading OpenResty ${OPENRESTY_RPM_VERSION}"
 curl --retry-delay 5 --retry 3 -s -L https://openresty.org/download/openresty-"${OPENRESTY_RPM_VERSION}".tar.gz -o "${TEMP}/openresty.tar.gz"
 md5sum -c <<<"${OPENRESTY_MD5} ${TEMP}/openresty.tar.gz"
 tar zxf "${TEMP}/openresty.tar.gz" -C "${TEMP}"/
