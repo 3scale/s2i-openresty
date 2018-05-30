@@ -3,10 +3,9 @@
 yum install -y centos-release-scl epel-release
 yum install -y GeoIP libxml2 libxslt gd
 
+yum-builddep -y "openresty-${OPENRESTY_RPM_VERSION}"
 yum install -y \
-        openresty-openssl-devel \
-        openresty-pcre-devel \
-        git devtoolset-7-gcc-c++ cmake3 make GeoIP-devel \
+        git devtoolset-7-gcc-c++ cmake3 GeoIP-devel \
 	libxml2-devel libxslt-devel gd-devel \
 
 # Source the devtoolset-7, building tools (gcc...)
@@ -20,11 +19,12 @@ TEMP="$(mktemp -d)"
 export HUNTER_ROOT="${TEMP:-.}/.hunter"
 ROOT='/opt/app-root/'
 
-OPENTRACING_CPP_VERSION="v1.3.0"
+OPENTRACING_CPP_VERSION="v1.4.2"
 NGINX_OPENTRACING_VERSION="v0.3.0"
-JAEGER_CPP_VERSION="v0.3.0"
-OPENRESTY_MD5="637f82d0b36c74aec1c01bd3b8e0289c"
+JAEGER_CPP_VERSION="v0.4.1"
+OPENRESTY_MD5="d95bc4bbe15e4b045a0593b4ecc0db38"
 
+echo "Downloading OpenResty ${OPENRESTY_RPM_VERSION}"
 curl --retry-delay 5 --retry 3 -s -L https://openresty.org/download/openresty-"${OPENRESTY_RPM_VERSION}".tar.gz -o "${TEMP}/openresty.tar.gz"
 md5sum -c <<<"${OPENRESTY_MD5} ${TEMP}/openresty.tar.gz"
 tar zxf "${TEMP}/openresty.tar.gz" -C "${TEMP}"/
@@ -47,37 +47,11 @@ make install
 #we need to configure it the same way.
 pushd "${TEMP}/openresty-${OPENRESTY_RPM_VERSION}"
 
+# shellcheck disable=SC2086
 ./configure -j"$(nproc)" \
             --with-cc-opt="-I/usr/local/openresty/openssl/include/ -I/usr/local/openresty/pcre/include/ -I$ROOT/include" \
 	    --with-ld-opt="-L/usr/local/openresty/openssl/lib/ -L/usr/local/openresty/pcre/lib/ -L$ROOT/lib" \
-            --with-file-aio \
-            --with-http_addition_module \
-            --with-http_auth_request_module \
-            --with-http_dav_module \
-            --with-http_flv_module \
-            --with-http_geoip_module=dynamic \
-            --with-http_gunzip_module \
-            --with-http_gzip_static_module \
-            --with-http_image_filter_module=dynamic \
-            --with-http_mp4_module \
-            --with-http_random_index_module \
-            --with-http_realip_module \
-            --with-http_secure_link_module \
-            --with-http_slice_module \
-            --with-http_ssl_module \
-            --with-http_stub_status_module \
-            --with-http_sub_module \
-            --with-http_v2_module \
-            --with-http_xslt_module=dynamic \
-            --with-ipv6 \
-            --with-mail \
-            --with-mail_ssl_module \
-            --with-md5-asm \
-            --with-pcre-jit \
-            --with-sha1-asm \
-            --with-stream \
-            --with-stream_ssl_module \
-            --with-threads \
+	    $(openresty -V 2>&1 | awk -F" " '{ for (i=4; i<=NF; i++) { if($i ~/--with/ && $i !~ /-opt=/) { print $i } } }') \
             --add-dynamic-module="${TEMP}/nginx-opentracing/opentracing"
 
 pushd "build/nginx-1.13.6/"
@@ -103,6 +77,6 @@ make install
 # clean
 rm -rf "${HUNTER_ROOT}" "${TEMP}" "${BASH_SOURCE[0]}"
 
-yum history undo last -y
+yum history rollback last-2 -y
 
 yum clean all -y
