@@ -19,9 +19,9 @@ TEMP="$(mktemp -d)"
 export HUNTER_ROOT="${TEMP:-.}/.hunter"
 ROOT='/opt/app-root/'
 
-OPENTRACING_CPP_VERSION="v1.4.2"
+OPENTRACING_CPP_VERSION="v1.3.0"
 NGINX_OPENTRACING_VERSION="v0.3.0"
-JAEGER_CPP_VERSION="v0.4.1"
+JAEGER_CPP_VERSION="v0.3.0"
 OPENRESTY_MD5="d95bc4bbe15e4b045a0593b4ecc0db38"
 
 echo "Downloading OpenResty ${OPENRESTY_RPM_VERSION}"
@@ -70,7 +70,9 @@ cd "${TEMP}/jaeger-cpp"
 mkdir .build
 cd .build
 cmake3 -DCMAKE_BUILD_TYPE=Release .. \
-	-DCMAKE_INSTALL_PREFIX:PATH=$ROOT
+	-DCMAKE_INSTALL_PREFIX:PATH=$ROOT \
+	-DCMAKE_INSTALL_LIBDIR=lib \
+	
 make -j"$(nproc)"
 make install
 

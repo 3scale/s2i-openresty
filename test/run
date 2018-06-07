@@ -223,6 +223,16 @@ test_top() {
   return $?
 }
 
+test_lib() {
+  local cid=$1
+  local lib=$2
+  echo "Testing library $lib is available ..."
+
+  test=$(docker exec $(cat ${cid}) container-entrypoint resty -e "require('ffi').load('$lib')")
+
+  return $?
+}
+
 # Build the application image twice to ensure the 'save-artifacts' and
 # 'restore-artifacts' scripts are working properly
 prepare
@@ -255,6 +265,12 @@ check_result $?
 test_top ${cid_file}
 check_result $?
 
+test_lib ${cid_file} jaegertracing
+check_result $?
+
+test_lib ${cid_file} opentracing
+check_result $?
+
 cleanup
 
 start_runtime_test_application
@@ -267,6 +283,12 @@ check_result $?
 
 start_runtime_test_application /usr/libexec/s2i/run
 test_connection ${runtime_cid_file}
+check_result $?
+
+test_lib ${runtime_cid_file} jaegertracing
+check_result $?
+
+test_lib ${runtime_cid_file} opentracing
 check_result $?
 
 cleanup_runtime
