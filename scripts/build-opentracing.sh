@@ -70,7 +70,9 @@ cd "${TEMP}/jaeger-cpp"
 mkdir .build
 cd .build
 cmake3 -DCMAKE_BUILD_TYPE=Release .. \
-	-DCMAKE_INSTALL_PREFIX:PATH=$ROOT
+	-DCMAKE_INSTALL_PREFIX:PATH=$ROOT \
+	-DCMAKE_INSTALL_LIBDIR=lib \
+	
 make -j"$(nproc)"
 make install
 
