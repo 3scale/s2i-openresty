@@ -42,7 +42,7 @@ ENV PATH="./lua_modules/bin:/usr/local/openresty/luajit/bin/:${PATH}" \
     LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/app-root/lib"
 
 RUN \
-  yum install -y luarocks && \
+  yum install -y luarocks-${LUAROCKS_VERSION} && \
   luarocks install --server=http://luarocks.org/dev lua-rover && \
   rover -v && \
   yum -y remove luarocks && \
