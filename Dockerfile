@@ -20,6 +20,7 @@ RUN yum clean all -y \
         perl-Test-Nginx perl-TAP-Harness-JUnit \
         perl-local-lib perl-App-cpanminus \
         dnsmasq \
+        libyaml-devel \
  && yum install -y \
         openresty-${OPENRESTY_RPM_VERSION} \
         openresty-resty-${OPENRESTY_RPM_VERSION} \
