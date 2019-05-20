@@ -2,7 +2,7 @@
 # s2i-openresty-centos7
 FROM openshift/base-centos7
 
-ARG OPENRESTY_RPM_VERSION="1.13.6.2"
+ARG OPENRESTY_RPM_VERSION="1.15.8.1"
 ARG LUAROCKS_VERSION="2.3.0"
 
 LABEL io.k8s.description="Platform for building openresty" \
@@ -13,7 +13,7 @@ LABEL io.k8s.description="Platform for building openresty" \
 WORKDIR /tmp
 
 RUN yum clean all -y \
- && yum-config-manager --add-repo https://openresty.org/yum/centos/OpenResty.repo \
+ && yum-config-manager --add-repo https://openresty.org/package/centos/openresty.repo \
  && yum install -y epel-release \
  && yum upgrade -y \
  && yum install -y \
