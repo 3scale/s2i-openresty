@@ -22,7 +22,7 @@ ROOT='/opt/app-root/'
 OPENTRACING_CPP_VERSION="v1.3.0"
 NGINX_OPENTRACING_VERSION="v0.3.0"
 JAEGER_CPP_VERSION="v0.3.0"
-OPENRESTY_MD5="d95bc4bbe15e4b045a0593b4ecc0db38"
+OPENRESTY_MD5="d614e17360e3a805ff94edbf7037221c"
 
 echo "Downloading OpenResty ${OPENRESTY_RPM_VERSION}"
 curl --retry-delay 5 --retry 3 -s -L https://openresty.org/download/openresty-"${OPENRESTY_RPM_VERSION}".tar.gz -o "${TEMP}/openresty.tar.gz"
@@ -54,7 +54,7 @@ pushd "${TEMP}/openresty-${OPENRESTY_RPM_VERSION}"
 	    $(openresty -V 2>&1 | awk -F" " '{ for (i=4; i<=NF; i++) { if($i ~/--with/ && $i !~ /-opt=/) { print $i } } }') \
             --add-dynamic-module="${TEMP}/nginx-opentracing/opentracing"
 
-pushd "build/nginx-1.13.6/"
+pushd build/nginx-*
 make modules
 
 for openresty in /usr/local/openresty* ; do

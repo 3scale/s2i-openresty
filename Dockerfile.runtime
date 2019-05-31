@@ -1,7 +1,7 @@
 # s2i-openresty-centos7-runtime
 FROM centos:centos7
 
-ARG OPENRESTY_RPM_VERSION="1.13.6.2"
+ARG OPENRESTY_RPM_VERSION="1.15.8.1"
 
 ENV HOME=/opt/app-root/src \
     PATH=/opt/app-root/src/bin:/opt/app-root/bin:$PATH \
