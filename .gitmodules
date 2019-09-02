@@ -1,4 +1,4 @@
 [submodule "test/test-app"]
 	path = test/test-app
 	url = https://github.com/3scale/docker-gateway.git
-	branch = v2
+	branch = master
