@@ -51,7 +51,7 @@ pushd "${TEMP}/openresty-${OPENRESTY_RPM_VERSION}"
 ./configure -j"$(nproc)" \
             --with-cc-opt="-I/usr/local/openresty/openssl/include/ -I/usr/local/openresty/pcre/include/ -I$ROOT/include" \
 	    --with-ld-opt="-L/usr/local/openresty/openssl/lib/ -L/usr/local/openresty/pcre/lib/ -L$ROOT/lib" \
-	    $(openresty -V 2>&1 | awk -F" " '{ for (i=4; i<=NF; i++) { if($i ~/--with/ && $i !~ /-opt=/) { print $i } } }') \
+        $(openresty -V 2>&1 | awk -F" " '{ for (i=4; i<=NF; i++) { if($i ~/--with/ && $i !~ /-opt=/ && $i !~ /--with-cc/) { print $i } } }') \
             --add-dynamic-module="${TEMP}/nginx-opentracing/opentracing"
 
 pushd build/nginx-*
