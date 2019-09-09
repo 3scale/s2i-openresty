@@ -22,7 +22,7 @@ ROOT='/opt/app-root/'
 OPENTRACING_CPP_VERSION="v1.3.0"
 NGINX_OPENTRACING_VERSION="v0.3.0"
 JAEGER_CPP_VERSION="v0.3.0"
-OPENRESTY_MD5="d614e17360e3a805ff94edbf7037221c"
+OPENRESTY_MD5="fcc84af342ff2c073a47ffe2d3fe7b20"
 
 echo "Downloading OpenResty ${OPENRESTY_RPM_VERSION}"
 curl --retry-delay 5 --retry 3 -s -L https://openresty.org/download/openresty-"${OPENRESTY_RPM_VERSION}".tar.gz -o "${TEMP}/openresty.tar.gz"
