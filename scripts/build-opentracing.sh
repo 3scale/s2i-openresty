@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -x
+
 yum install -y centos-release-scl epel-release
 yum install -y GeoIP libxml2 libxslt gd
 
@@ -7,6 +9,7 @@ yum-builddep -y "openresty-${OPENRESTY_RPM_VERSION}"
 yum install -y \
         git devtoolset-7-gcc-c++ cmake3 GeoIP-devel \
 	libxml2-devel libxslt-devel gd-devel \
+    make gcc gcc-c++ pcre-devel openssl-devel
 
 # Source the devtoolset-7, building tools (gcc...)
 # Sourced before the fail modes due to an unbound variable in the script
