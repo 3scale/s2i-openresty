@@ -9,7 +9,8 @@ yum-builddep -y "openresty-${OPENRESTY_RPM_VERSION}"
 yum install -y \
         git devtoolset-7-gcc-c++ cmake3 GeoIP-devel \
 	libxml2-devel libxslt-devel gd-devel \
-    make gcc gcc-c++ pcre-devel openssl-devel
+    make gcc gcc-c++ pcre-devel openssl-devel \
+    systemtap-sdt-devel
 
 # Source the devtoolset-7, building tools (gcc...)
 # Sourced before the fail modes due to an unbound variable in the script
