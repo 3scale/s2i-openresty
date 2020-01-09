@@ -1,27 +1,29 @@
-# s2i-openresty-centos7-runtime
-FROM centos:centos7
+FROM centos:8
 
-ARG OPENRESTY_RPM_VERSION="1.15.8.1"
+ARG OPENRESTY_RPM_VERSION="1.17.4.1"
 
 ENV HOME=/opt/app-root/src \
     PATH=/opt/app-root/src/bin:/opt/app-root/bin:$PATH \
     LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/app-root/lib"
 
-COPY scripts/build-opentracing.sh /tmp/build-opentracing.sh
-
 RUN mkdir -p "${HOME}" && \
     useradd -u 1001 -r -g 0 -d ${HOME} -s /sbin/nologin \
             -c "Default Application User" default && \
-    yum-config-manager --add-repo https://openresty.org/yum/centos/OpenResty.repo && \
-    rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
+
+    dnf install -y 'dnf-command(config-manager)' && \
+    yum config-manager --add-repo http://packages.dev.3sca.net/dev_packages_3sca_net.repo && \
     yum install -y tar libyaml && \
-    yum install -y openresty-${OPENRESTY_RPM_VERSION} \
-                   openresty-resty-${OPENRESTY_RPM_VERSION} \
-                   openresty-openssl && \
-    /tmp/build-opentracing.sh && \
+    yum install -y \
+        openresty-${OPENRESTY_RPM_VERSION} \
+        openresty-resty-${OPENRESTY_RPM_VERSION} \
+        openresty-opentracing-${OPENRESTY_RPM_VERSION} \
+        jaegertracing-cpp-client && \
     yum clean all && \
+    ln -s /usr/local/openresty/luajit/bin/luajit  /usr/bin/lua && \
     ln -sf /dev/stdout /usr/local/openresty/nginx/logs/access.log && \
-    ln -sf /dev/stderr /usr/local/openresty/nginx/logs/error.log
+    ln -sf /dev/stderr /usr/local/openresty/nginx/logs/error.log && \
+    mkdir -p /usr/local/openresty/nginx/client_body_temp && \
+    chmod 777 /usr/local/openresty/nginx/client_body_temp/
 
 LABEL io.openshift.s2i.scripts-url=image:///usr/libexec/s2i \
       io.k8s.description="Platform for building openresty" \
@@ -49,8 +51,9 @@ EXPOSE 8080
 WORKDIR /opt/app-root
 
 ENV PATH="./lua_modules/bin:/usr/local/openresty/luajit/bin/:${PATH}" \
- LUA_PATH="./lua_modules/share/lua/5.1/?.lua;./lua_modules/share/lua/5.1/?/init.lua;;" \
- LUA_CPATH="./lua_modules/lib/lua/5.1/?.so;;"
+    LUA_PATH="./lua_modules/share/lua/5.1/?.lua;./lua_modules/share/lua/5.1/?/init.lua;/usr/lib64/lua/5.1/?.lua;/usr/share/lua/5.1/?.lua;" \
+    LUA_CPATH="./lua_modules/lib/lua/5.1/?.so;;" \
+    LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/app-root/lib"
 
 ENTRYPOINT ["container-entrypoint"]
 CMD ["/usr/libexec/s2i/usage"]

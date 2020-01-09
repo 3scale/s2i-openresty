@@ -9,6 +9,7 @@
 # IMAGE_NAME specifies a name of the candidate image used for testing.
 # The image has to be available before this script is executed.
 #
+
 set -u
 
 IMAGE_NAME=${IMAGE_NAME-s2i-openresty-centos7-candidate}
@@ -268,8 +269,8 @@ check_result $?
 test_lib ${cid_file} jaegertracing
 check_result $?
 
-test_lib ${cid_file} opentracing
-check_result $?
+# test_lib ${cid_file} opentracing
+# check_result $?
 
 cleanup
 
@@ -288,7 +289,7 @@ check_result $?
 test_lib ${runtime_cid_file} jaegertracing
 check_result $?
 
-test_lib ${runtime_cid_file} opentracing
-check_result $?
+# test_lib ${runtime_cid_file} opentracing
+# check_result $?
 
 cleanup_runtime
