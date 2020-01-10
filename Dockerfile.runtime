@@ -12,7 +12,7 @@ RUN mkdir -p "${HOME}" && \
 
     dnf install -y 'dnf-command(config-manager)' && \
     yum config-manager --add-repo http://packages.dev.3sca.net/dev_packages_3sca_net.repo && \
-    yum install -y tar libyaml openssl-devel && \
+    yum install -y tar libyaml openssl-devel m4 && \
     yum install -y \
         openresty-${OPENRESTY_RPM_VERSION} \
         openresty-resty-${OPENRESTY_RPM_VERSION} \
