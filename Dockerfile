@@ -22,7 +22,7 @@ RUN yum upgrade -y \
     && dnf --enablerepo=PowerTools install -y perl-List-MoreUtils perl-Test-LongString libyaml-devel\
     && yum install -y \
         gcc make git which curl expat-devel\
-        perl-Test-Nginx \
+        perl-Test-Nginx openssl-devel\
         perl-local-lib perl-App-cpanminus \
         libyaml \
     && yum install -y \
