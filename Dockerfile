@@ -30,7 +30,6 @@ RUN yum upgrade -y \
         openresty-resty-${OPENRESTY_RPM_VERSION} \
         openresty-opentracing-${OPENRESTY_RPM_VERSION} \
         jaegertracing-cpp-client \
-    && ln -s /usr/local/openresty/luajit/bin/luajit  /usr/bin/lua \
     && echo "Cleaning all dependencies" \
     %% yum clean all -y \
     && ln -sf /dev/stdout /usr/local/openresty/nginx/logs/access.log \

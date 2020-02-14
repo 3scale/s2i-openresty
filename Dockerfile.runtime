@@ -19,7 +19,6 @@ RUN mkdir -p "${HOME}" && \
         openresty-opentracing-${OPENRESTY_RPM_VERSION} \
         jaegertracing-cpp-client && \
     yum clean all && \
-    ln -s /usr/local/openresty/luajit/bin/luajit  /usr/bin/lua && \
     ln -sf /dev/stdout /usr/local/openresty/nginx/logs/access.log && \
     ln -sf /dev/stderr /usr/local/openresty/nginx/logs/error.log && \
     mkdir -p /usr/local/openresty/nginx/client_body_temp && \
