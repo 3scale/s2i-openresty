@@ -1,6 +1,6 @@
 FROM centos:8
 
-ARG OPENRESTY_RPM_VERSION="1.17.4"
+ARG OPENRESTY_RPM_VERSION="1.17.5"
 ARG LUAROCKS_VERSION="2.3.0"
 
 LABEL io.k8s.description="Platform for building openresty" \
