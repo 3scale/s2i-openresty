@@ -1,4 +1,4 @@
-FROM centos:8
+FROM quay.io/centos/centos:centos8.3.2011
 
 ARG OPENRESTY_RPM_VERSION="1.17.5"
 ARG LUAROCKS_VERSION="2.3.0"
@@ -21,7 +21,7 @@ RUN yum upgrade -y \
     && yum config-manager --add-repo http://packages.dev.3sca.net/dev_packages_3sca_net.repo \
     && dnf --enablerepo=powertools install -y perl-List-MoreUtils perl-Test-LongString libyaml-devel\
     && yum install -y \
-        gcc make git which curl expat-devel \
+        gcc make git which curl expat-devel kernel-headers\
         perl-Test-Nginx openssl-devel m4 \
         perl-local-lib perl-App-cpanminus \
         libyaml \
