@@ -24,7 +24,7 @@ RUN yum upgrade -y \
         gcc make git which curl expat-devel kernel-headers\
         perl-Test-Nginx openssl-devel m4 \
         perl-local-lib perl-App-cpanminus \
-        libyaml \
+        libyaml perf\
     && yum install -y \
         openresty-${OPENRESTY_RPM_VERSION} \
         openresty-resty-${OPENRESTY_RPM_VERSION} \
