@@ -1,6 +1,6 @@
 FROM quay.io/centos/centos:centos8.3.2011
 
-ARG OPENRESTY_RPM_VERSION="1.17.5"
+ARG OPENRESTY_RPM_VERSION="1.19.3"
 ARG LUAROCKS_VERSION="2.3.0"
 
 LABEL io.k8s.description="Platform for building openresty" \

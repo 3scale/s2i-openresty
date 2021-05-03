@@ -1,6 +1,6 @@
 FROM centos:8
 
-ARG OPENRESTY_RPM_VERSION="1.17.5"
+ARG OPENRESTY_RPM_VERSION="1.19.3"
 
 ENV HOME=/opt/app-root/src \
     PATH=/opt/app-root/src/bin:/opt/app-root/bin:$PATH \
