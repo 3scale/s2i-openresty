@@ -1,6 +1,6 @@
 FROM quay.io/centos/centos:centos8.3.2011
 
-ARG OPENRESTY_RPM_VERSION="1.17.5"
+ARG OPENRESTY_RPM_VERSION="1.17.8"
 ARG LUAROCKS_VERSION="2.3.0"
 
 LABEL io.k8s.description="Platform for building openresty" \
@@ -19,6 +19,7 @@ ENV APP_ROOT=/opt/app-root \
 RUN yum upgrade -y \
     && dnf install -y 'dnf-command(config-manager)' \
     && yum config-manager --add-repo http://packages.dev.3sca.net/dev_packages_3sca_net.repo \
+    && sed -i 's/\.net$/.net\/keepalive/g' /etc/yum.repos.d/dev_packages_3sca_net.repo \
     && dnf --enablerepo=powertools install -y perl-List-MoreUtils perl-Test-LongString libyaml-devel\
     && yum install -y \
         gcc make git which curl expat-devel kernel-headers\
