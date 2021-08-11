@@ -1,0 +1,38 @@
+name: build
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: |
+          export PATH="${PATH}:${HOME}/bin"
+          ./travis/install-s2i.sh
+          make build
+          make build-runtime
+        env:
+          S2I_VERSION: 1.1.14-874754de
+
+      - name: Test
+        run: |
+          export PATH="${PATH}:${HOME}/bin"
+          make test
+
+      - name: Login to quay.io/3scale
+        uses: docker/login-action@v1
+        with:
+          registry: quay.io
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Push image
+        run: |
+          make push tag
+        env:
+          TAG: latest

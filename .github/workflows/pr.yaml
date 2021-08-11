@@ -1,0 +1,25 @@
+name: test
+
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: |
+          export PATH="${PATH}:${HOME}/bin"
+          ./travis/install-s2i.sh
+          make build
+          make build-runtime
+        env:
+          S2I_VERSION: 1.1.14-874754de
+
+      - name: Test
+        run: |
+          export PATH="${PATH}:${HOME}/bin"
+          make test
