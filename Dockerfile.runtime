@@ -1,10 +1,12 @@
-FROM centos:8
+FROM registry.access.redhat.com/ubi8:8.5
 
 ARG OPENRESTY_RPM_VERSION="1.19.3"
 
 ENV HOME=/opt/app-root/src \
     PATH=/opt/app-root/src/bin:/opt/app-root/bin:$PATH \
     LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/app-root/lib"
+
+RUN sed -i s/enabled=./enabled=0/g /etc/yum/pluginconf.d/subscription-manager.conf
 
 RUN mkdir -p "${HOME}" && \
     useradd -u 1001 -r -g 0 -d ${HOME} -s /sbin/nologin \
