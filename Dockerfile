@@ -1,4 +1,4 @@
-FROM quay.io/centos/centos:centos8.3.2011
+FROM registry.access.redhat.com/ubi8:8.5
 
 ARG OPENRESTY_RPM_VERSION="1.19.3"
 ARG LUAROCKS_VERSION="2.3.0"
@@ -16,29 +16,31 @@ ENV APP_ROOT=/opt/app-root \
     PATH=/opt/app-root/src/bin:/opt/app-root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     PLATFORM="el8"
 
-RUN yum upgrade -y \
-    && dnf install -y 'dnf-command(config-manager)' \
-    && yum config-manager --add-repo http://packages.dev.3sca.net/dev_packages_3sca_net.repo \
-    && dnf --enablerepo=powertools install -y perl-List-MoreUtils perl-Test-LongString libyaml-devel\
-    && yum install -y \
-        gcc make git which curl expat-devel kernel-headers\
-        perl-Test-Nginx openssl-devel m4 \
-        perl-local-lib perl-App-cpanminus \
-        libyaml perf\
-    && yum install -y \
+RUN sed -i s/enabled=./enabled=0/g /etc/yum/pluginconf.d/subscription-manager.conf
+
+RUN yum upgrade -y 
+
+RUN dnf install -y 'dnf-command(config-manager)'
+
+RUN yum install -y \
+        gcc make git which curl expat-devel kernel-headers openssl-devel m4 \
+        libyaml libyaml-devel perl-local-lib perl-App-cpanminus
+
+# perl-Test-Nginx
+RUN cpanm https://cpan.metacpan.org/authors/id/A/AG/AGENT/Test-Nginx-0.29.tar.gz
+
+RUN yum config-manager --add-repo http://packages.dev.3sca.net/dev_packages_3sca_net.repo
+
+RUN yum install -y \
         openresty-${OPENRESTY_RPM_VERSION} \
         openresty-resty-${OPENRESTY_RPM_VERSION} \
         openresty-opentracing-${OPENRESTY_RPM_VERSION} \
-        jaegertracing-cpp-client \
-    && echo "Cleaning all dependencies" \
-    %% yum clean all -y \
-    && ln -sf /dev/stdout /usr/local/openresty/nginx/logs/access.log \
+        jaegertracing-cpp-client 
+
+RUN ln -sf /dev/stdout /usr/local/openresty/nginx/logs/access.log \
     && ln -sf /dev/stderr /usr/local/openresty/nginx/logs/error.log \
     && mkdir -p /usr/local/openresty/nginx/client_body_temp/ \
     && chmod 777 /usr/local/openresty/nginx/client_body_temp/
-
-# TODO (optional): Copy the builder files into /opt/app
-# COPY ./<builder_folder>/ /opt/app/
 
 COPY site_config.lua /usr/share/lua/5.1/luarocks/site_config.lua
 COPY config-*.lua /usr/local/openresty/config-5.1.lua
@@ -47,7 +49,6 @@ ENV PATH="./lua_modules/bin:/usr/local/openresty/luajit/bin/:${PATH}" \
     LUA_PATH="./lua_modules/share/lua/5.1/?.lua;./lua_modules/share/lua/5.1/?/init.lua;/usr/lib64/lua/5.1/?.lua;/usr/share/lua/5.1/?.lua" \
     LUA_CPATH="./lua_modules/lib/lua/5.1/?.so;;" \
     LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/app-root/lib"
-
 
 RUN yum install -y luarocks && \
     luarocks install --server=http://luarocks.org/dev lua-rover && \
